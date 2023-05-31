@@ -1,0 +1,56 @@
+plugins {
+    id 'org.springframework.boot' version '2.7.1'
+    id 'java'
+}
+
+group 'com.vanchondo.sso'
+version '1.0-SNAPSHOT'
+sourceCompatibility= '1.11'
+
+def lombok_version = '1.18.+'
+def springBoot_version = '2.7.+'
+def jsonwebtoken_version = '0.11.+'
+def swagger_version = '3.0.+'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-parent', version: "${springBoot_version}", ext: 'pom'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: "${springBoot_version}"
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb', version: "${springBoot_version}"
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: "${springBoot_version}"
+
+    implementation group: 'io.springfox', name: 'springfox-boot-starter', version: "${swagger_version}"
+    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: "${swagger_version}"
+
+
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.+'
+
+    implementation group: 'com.github.ulisesbocchio', name: 'jasypt-spring-boot-starter', version: '3.0.4'
+
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: "${jsonwebtoken_version}"
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: "${jsonwebtoken_version}"
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-gson', version: "${jsonwebtoken_version}"
+
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.+'
+
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: "${lombok_version}"
+    annotationProcessor group: 'org.projectlombok', name:'lombok', version: "${lombok_version}"
+
+    // OWASP
+    implementation group: 'com.googlecode.owasp-java-html-sanitizer', name: 'owasp-java-html-sanitizer', version: '20220608.1'
+
+
+    // Test libraries
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: "${springBoot_version}"
+    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: "${lombok_version}"
+    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombok_version}"
+
+}
+
+bootRun {
+    systemProperty "spring.profiles.active", findProperty("spring.profiles.active")
+    systemProperty "jasypt.encryptor.password", findProperty("jasypt.encryptor.password")
+}

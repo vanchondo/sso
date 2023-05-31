@@ -1,0 +1,1 @@
+    web: java -Dspring.profiles.active=dev -Djasypt.encryptor.password=$JASYPT_SECRET_KEY -Dserver.port=$PORT -jar build/libs/sso-1.0-SNAPSHOT.jar
