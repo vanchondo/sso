@@ -42,6 +42,7 @@ dependencies {
     // OWASP
     implementation group: 'com.googlecode.owasp-java-html-sanitizer', name: 'owasp-java-html-sanitizer', version: '20220608.1'
 
+     implementation 'org.eclipse.angus:angus-mail:2.0.2'
 
     // Test libraries
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: "${springBoot_version}"

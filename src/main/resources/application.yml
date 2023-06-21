@@ -3,6 +3,18 @@ spring:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
 
+mail:
+  smtp:
+    auth: true
+    starttls:
+      enable: true
+    host: smtp-mail.outlook.com
+    port: 587
+    ssl:
+      trust: smtp-mail.outlook.com
+    username: ENC(Gjn/ileOQ4s7FaVYYWykG1tSC2ZXWAxTZGCtd3BovsLN0Kzv81XRDQ==)
+    password: ENC(4urs70afj8Avx+BgLkZQ2jhfCOv2O2DZweXWziq2aNc=)
+
 com:
   vanchondo:
     login:
