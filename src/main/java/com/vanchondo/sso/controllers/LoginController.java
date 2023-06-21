@@ -36,7 +36,7 @@ public class LoginController {
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
-    @GetMapping(value = "validate")
+    @PostMapping(value = "validate")
     public ResponseEntity<UserDTO> validateUser(@RequestParam("email") String email, @RequestParam("token") String token){
         userService.validateUser(email, token);
         return ResponseEntity.ok().build();

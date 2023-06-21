@@ -54,11 +54,13 @@ public class UserService {
 
     public void validateUser(String email, String token) {
         if (StringUtils.isEmpty(token) || StringUtils.isEmpty(email)) {
-            throw new NotFoundException("User validation not found");
+            //. Do not return error to avoid data leaking
+            return;
         }
         UserEntity entity = userRepository.findByEmail(email);
         if (entity == null) {
-            throw new NotFoundException("User validation not found");
+            //. Do not return error to avoid data leaking
+            return;
         }
         if (!entity.isActive() && token.equals(entity.getVerificationToken())) {
             entity.setActive(true);
