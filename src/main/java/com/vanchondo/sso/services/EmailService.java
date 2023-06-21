@@ -9,7 +9,7 @@ import lombok.extern.log4j.Log4j2;
 @Service
 @Log4j2
 public class EmailService {
-    private EmailConfiguration emailConfiguration;
+    private final EmailConfiguration emailConfiguration;
     private final Session session;
 
     public EmailService(EmailConfiguration emailConfiguration) {
@@ -27,7 +27,7 @@ public class EmailService {
 
     public void sendEmail(String toEmail) throws MessagingException {
         Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(emailConfiguration.getPassword()));
+        message.setFrom(new InternetAddress(emailConfiguration.getUsername()));
         message.setRecipients(
                 Message.RecipientType.TO, InternetAddress.parse(toEmail));
         message.setSubject("Test Mail Subject");
