@@ -36,6 +36,12 @@ public class LoginController {
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
+    @GetMapping(value = "validate")
+    public ResponseEntity<UserDTO> validateUser(@RequestParam("email") String email, @RequestParam("token") String token){
+        userService.validateUser(email, token);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("login")
     public TokenDTO login(@RequestBody LoginDTO login) throws AuthenticationException {
         logger.info("::login::Entering login endpoint for username={}", login.getUsername());

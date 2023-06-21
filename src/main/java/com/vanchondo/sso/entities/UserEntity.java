@@ -15,6 +15,7 @@ public class UserEntity {
     @Indexed(unique=true)
     private String email;
     private String password;
+    private String verificationToken;
     private boolean isActive;
     private LocalDateTime lastUpdatedAt;
 }

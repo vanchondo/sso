@@ -11,35 +11,60 @@ import com.vanchondo.sso.exceptions.NotFoundException;
 import com.vanchondo.sso.mappers.UserDTOMapper;
 import com.vanchondo.sso.mappers.UserEntityMapper;
 import com.vanchondo.sso.repositories.UserRepository;
+import freemarker.template.TemplateException;
+import jakarta.mail.MessagingException;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-
 @Service
+@Log4j2
+@AllArgsConstructor
 public class UserService {
+    private EmailService emailService;
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder){
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
-
     public UserDTO saveUser(SaveUserDTO dto){
-        if (userRepository.findByEmail(dto.getEmail()) == null) {
+        if (userRepository.findByEmail(dto.getEmail()) == null && userRepository.findByUsername(dto.getUsername()) == null) {
             UserEntity entity = UserEntityMapper.map(dto);
-            // TODO send email to validate it
-            entity.setActive(true);
+            entity.setActive(false);
             entity.setLastUpdatedAt(LocalDateTime.now());
             entity.setPassword(passwordEncoder.encode(entity.getPassword()));
-
-            entity = userRepository.save(entity);
+            entity.setVerificationToken(UUID.randomUUID().toString());
+            try {
+                entity = userRepository.save(entity);
+                emailService.sendEmail(entity.getEmail(), entity.getVerificationToken());
+            } catch (MessagingException | TemplateException | IOException e) {
+                userRepository.delete(entity);
+                log.error("::saveUser:: Error sending email to={}", entity.getEmail(), e);
+                throw new ConflictException("Error sending email to=" + entity.getEmail());
+            }
             return UserDTOMapper.map(entity);
         }
         else {
-            throw new ConflictException("Email is already registered");
+            throw new ConflictException("Email or username already registered");
+        }
+    }
+
+    public void validateUser(String email, String token) {
+        if (StringUtils.isEmpty(token) || StringUtils.isEmpty(email)) {
+            throw new NotFoundException("User validation not found");
+        }
+        UserEntity entity = userRepository.findByEmail(email);
+        if (entity == null) {
+            throw new NotFoundException("User validation not found");
+        }
+        if (!entity.isActive() && token.equals(entity.getVerificationToken())) {
+            entity.setActive(true);
+            entity.setLastUpdatedAt(LocalDateTime.now());
+            entity.setVerificationToken(null);
+            userRepository.save(entity);
         }
     }
 

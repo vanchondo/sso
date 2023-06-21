@@ -12,16 +12,29 @@ import lombok.extern.log4j.Log4j2;
 public class GlobalControllerAdvice {
     private static String logMessage = "::handle:: Handle exception response for ex={}";
 
+//    {
+//        "timestamp": 1687361574931,
+//        "status": 401,
+//        "error": "Unauthorized",
+//        "path": "/validate"
+//    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<String> handle(AuthenticationException ex) {
+        log.info(logMessage, ex.getMessage(), ex);
+        return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
+    }
+
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<String> handle(ConflictException ex) {
         log.info(logMessage, ex.getMessage(), ex);
-        return buildResponse(HttpStatus.CONFLICT);
+        return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
     }    
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<String> handle(NotFoundException ex) {
         log.info(logMessage, ex.getMessage(), ex);
-        return buildResponse(HttpStatus.NOT_FOUND);
+        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)

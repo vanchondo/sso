@@ -25,6 +25,8 @@ com:
       unsecuredUrls:
         - url: /login
           methods: POST
+        - url: /validate
+          methods: GET
         - url: /register
           methods: POST
         - url: /users/available

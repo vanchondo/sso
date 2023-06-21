@@ -4,13 +4,13 @@ import com.vanchondo.sso.configs.properties.LoginConfiguration;
 import com.vanchondo.sso.dtos.security.LoginDTO;
 import com.vanchondo.sso.dtos.security.TokenDTO;
 import com.vanchondo.sso.entities.UserEntity;
+import com.vanchondo.sso.exceptions.AuthenticationException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 import java.security.Key;
 import java.util.Calendar;
 import java.util.Date;
-import javax.security.sasl.AuthenticationException;
 
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -55,7 +55,7 @@ public class AuthenticationService {
         }
         if (!user.isActive()) {
             logger.warn("User is not active, username={}", username);
-            throw new AuthenticationException("User was deleted");
+            throw new AuthenticationException("User is not active");
         }
 
         return generateToken(user);

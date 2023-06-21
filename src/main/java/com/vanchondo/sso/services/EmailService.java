@@ -44,13 +44,13 @@ public class EmailService {
         });
     }
 
-    public void sendEmail(String toEmail) throws MessagingException, TemplateException, IOException {
+    public void sendEmail(String toEmail, String token) throws MessagingException, TemplateException, IOException {
         Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(emailConfiguration.getUsername()));
         message.setRecipients(
                 Message.RecipientType.TO, InternetAddress.parse(toEmail));
         message.setSubject("Verificar cuenta");
-        String link = "https://login.victoranchondo.com";
+        String link = String.format("https://login.victoranchondo.com/validate?email=%s&token=%s", toEmail, token);
 
         String msg = getEmailBody(link);
         MimeBodyPart mimeBodyPart = new MimeBodyPart();
