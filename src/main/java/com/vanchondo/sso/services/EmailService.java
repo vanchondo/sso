@@ -1,6 +1,7 @@
 package com.vanchondo.sso.services;
 
 import com.vanchondo.sso.configs.properties.EmailConfiguration;
+import com.vanchondo.sso.utilities.EmailUtil;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -50,7 +51,7 @@ public class EmailService {
         message.setRecipients(
                 Message.RecipientType.TO, InternetAddress.parse(toEmail));
         message.setSubject("Verificar cuenta");
-        String link = String.format("https://login.victoranchondo.com/validate?email=%s&token=%s", toEmail, token);
+        String link = String.format("https://login.victoranchondo.com/validate?email=%s&token=%s", EmailUtil.encode(toEmail), EmailUtil.encode(token));
 
         String msg = getEmailBody(link);
         MimeBodyPart mimeBodyPart = new MimeBodyPart();

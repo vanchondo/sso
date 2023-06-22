@@ -19,6 +19,12 @@ public class GlobalControllerAdvice {
 //        "path": "/validate"
 //    }
 
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<String> handle(BadRequestException ex) {
+        log.info(logMessage, ex.getMessage(), ex);
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<String> handle(AuthenticationException ex) {
         log.info(logMessage, ex.getMessage(), ex);
