@@ -1,15 +1,15 @@
 package com.vanchondo.sso.dtos.users;
 
-import lombok.Data;
-
+import com.vanchondo.sso.utilities.RegexConstants;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.Pattern;
+import lombok.Data;
 
 @Data
 public class SaveUserDTO {
     @NotNull (message = "Username is required")
-    @Size(min = 6, max = 25, message = "Username not valid min=6, max=25")
+    @Pattern(regexp = RegexConstants.USERNAME_REGEX, message = "Username not valid min=6, max=29")
     private String username;
 
     @NotNull (message = "Email is required")
@@ -17,6 +17,6 @@ public class SaveUserDTO {
     private String email;
 
     @NotNull (message = "Password is required")
-    @Size(min = 6, max = 50, message = "Password not valid, min=6, max=50")
+    @Pattern(regexp = RegexConstants.PASSWORD_REGEX, message = "Password not valid, min=6, max=50" )
     private String password;
 }

@@ -1,7 +1,13 @@
 package com.vanchondo.sso.exceptions;
 
+import java.util.Optional;
+import java.util.stream.Collectors;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -18,6 +24,20 @@ public class GlobalControllerAdvice {
 //        "error": "Unauthorized",
 //        "path": "/validate"
 //    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handle(MethodArgumentNotValidException ex) {
+        String errorValidation = Optional.ofNullable(ex)
+            .map(MethodArgumentNotValidException::getBindingResult)
+            .map(BindingResult::getFieldErrors)
+            .map(fieldErrros -> fieldErrros.stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.joining("; "))
+            )
+            .orElse(Strings.EMPTY);
+        log.warn("::handle:: error={}", errorValidation, ex);
+        return buildResponse(HttpStatus.BAD_REQUEST, errorValidation);
+    }
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<String> handle(BadRequestException ex) {
