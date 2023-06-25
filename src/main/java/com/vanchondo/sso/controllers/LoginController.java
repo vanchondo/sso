@@ -1,5 +1,10 @@
 package com.vanchondo.sso.controllers;
 
+import static com.vanchondo.sso.utilities.Sanitize.sanitize;
+import static com.vanchondo.sso.utilities.Sanitize.sanitizeCurrentUserDTO;
+import static com.vanchondo.sso.utilities.Sanitize.sanitizeLoginDto;
+import static com.vanchondo.sso.utilities.Sanitize.sanitizeSaveUserDTO;
+
 import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.dtos.security.LoginDTO;
 import com.vanchondo.sso.dtos.security.TokenDTO;
@@ -31,13 +36,14 @@ public class LoginController {
 
     @PostMapping(value = "register")
     public ResponseEntity<UserDTO> saveUser(@Valid @RequestBody SaveUserDTO user){
+        sanitizeSaveUserDTO(user);
         UserDTO dto = userService.saveUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
     @PostMapping(value = "validate")
     public ResponseEntity<UserDTO> validateUser(@RequestParam("email") String email, @RequestParam("token") String token) {
-        userService.validateUser(email, token);
+        userService.validateUser(sanitize(email), sanitize(token));
         return ResponseEntity.ok().build();
 
     }
@@ -45,12 +51,14 @@ public class LoginController {
     @PostMapping("login")
     public TokenDTO login(@RequestBody LoginDTO login) throws AuthenticationException {
         log.info("::login::Entering login endpoint for username={}", login.getUsername());
+        sanitizeLoginDto(login);
         return authenticationService.login(login);
     }
 
     @GetMapping("currentUser")
     public CurrentUserDTO getCurrentUser(@RequestAttribute("currentUser") CurrentUserDTO currentUser){
         log.info("::getCurrentUser::Entering getCurrentUser endpoint for username={}", currentUser.getUsername());
+        sanitizeCurrentUserDTO(currentUser);
         return currentUser;
     }
 }
