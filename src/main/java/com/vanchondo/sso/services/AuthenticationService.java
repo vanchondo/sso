@@ -5,65 +5,48 @@ import com.vanchondo.sso.dtos.security.LoginDTO;
 import com.vanchondo.sso.dtos.security.TokenDTO;
 import com.vanchondo.sso.entities.UserEntity;
 import com.vanchondo.sso.exceptions.AuthenticationException;
+import com.vanchondo.sso.exceptions.NotFoundException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Calendar;
 import java.util.Date;
-
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@Log4j2
+@AllArgsConstructor
 public class AuthenticationService {
-
-    private final static Logger logger = LogManager.getLogger();
 
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final LoginConfiguration loginConfiguration;
 
-    public AuthenticationService(
-            UserService userService,
-            PasswordEncoder passwordEncoder,
-            LoginConfiguration loginConfiguration
-    ){
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-        this.loginConfiguration = loginConfiguration;
-    }
-
     public TokenDTO login(LoginDTO login) throws AuthenticationException {
         String username = login.getUsername();
         String password = login.getPassword();
 
-        if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
-            logger.warn("Invalid email or password for username={}", username);
-            throw new IllegalArgumentException("Invalid Email or password");
-        }
-
-        UserEntity user = userService.findUserEntityByUsername(username);
-        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
-            logger.warn("Invalid email or password for username={}", username);
+        try {
+            UserEntity user = userService.findUserEntityByUsername(username);
+            if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
+                log.warn("::login::Invalid email or password for username={}", username);
+                throw new AuthenticationException("Email or password incorrect");
+            }
+            if (!user.isActive()) {
+                log.warn("::login::User is not active, username={}", username);
+                throw new AuthenticationException("User is not active");
+            }
+            return generateToken(user);
+        }catch (NotFoundException ex){
+            log.warn("::login:: User not found", ex);
             throw new AuthenticationException("Email or password incorrect");
         }
-        if (!user.isActive()) {
-            logger.warn("User is not active, username={}", username);
-            throw new AuthenticationException("User is not active");
-        }
-
-        return generateToken(user);
     }
-
-//    public String getEncodedPassword(String password) {
-//        return passwordEncoder.encode(password);
-//    }
 
     private TokenDTO generateToken(UserEntity currentUser) {
         Calendar cal = Calendar.getInstance();

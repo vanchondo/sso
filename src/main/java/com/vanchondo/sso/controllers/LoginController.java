@@ -49,7 +49,7 @@ public class LoginController {
     }
 
     @PostMapping("login")
-    public TokenDTO login(@RequestBody LoginDTO login) throws AuthenticationException {
+    public TokenDTO login(@Valid @RequestBody LoginDTO login) throws AuthenticationException {
         log.info("::login::Entering login endpoint for username={}", login.getUsername());
         sanitizeLoginDto(login);
         return authenticationService.login(login);

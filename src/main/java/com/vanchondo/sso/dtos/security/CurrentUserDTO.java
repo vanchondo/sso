@@ -1,14 +1,9 @@
 package com.vanchondo.sso.dtos.security;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.Date;
+import lombok.Data;
 
 @Data
-@Getter
-@Setter
 public class CurrentUserDTO {
     private String iss;
     private String username;
