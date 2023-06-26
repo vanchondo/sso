@@ -23,15 +23,17 @@ com:
       expirationToken: 1440
 
       unsecuredUrls:
+        - url: /swagger*
+          methods: GET
+        - url: /v2/api-docs
+          methods: GET-
         - url: /login
           methods: POST
         - url: /validate
           methods: POST
         - url: /register
           methods: POST
+        - url: /regex
+          methods: GET
         - url: /users/available
-          methods: GET
-        - url: /swagger*
-          methods: GET
-        - url: /v2/api-docs
           methods: GET

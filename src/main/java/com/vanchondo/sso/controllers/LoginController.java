@@ -12,6 +12,9 @@ import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.services.AuthenticationService;
 import com.vanchondo.sso.services.UserService;
+import com.vanchondo.sso.utilities.RegexConstants;
+import java.util.HashMap;
+import java.util.Map;
 import javax.security.sasl.AuthenticationException;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -45,7 +48,6 @@ public class LoginController {
     public ResponseEntity<UserDTO> validateUser(@RequestParam("email") String email, @RequestParam("token") String token) {
         userService.validateUser(sanitize(email), sanitize(token));
         return ResponseEntity.ok().build();
-
     }
 
     @PostMapping("login")
@@ -60,5 +62,14 @@ public class LoginController {
         log.info("::getCurrentUser::Entering getCurrentUser endpoint for username={}", currentUser.getUsername());
         sanitizeCurrentUserDTO(currentUser);
         return currentUser;
+    }
+
+    @GetMapping("regex")
+    public Map<String, String> getRegex(){
+        log.info("::getRegex::Entering getRegex endpoint");
+        Map<String, String> regexMap = new HashMap<>();
+        regexMap.put("USERNAME_REGEX", RegexConstants.USERNAME_REGEX);
+        regexMap.put("PASSWORD_REGEX", RegexConstants.PASSWORD_REGEX);
+        return regexMap;
     }
 }
