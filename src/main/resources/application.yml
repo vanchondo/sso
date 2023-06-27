@@ -18,7 +18,8 @@ mail:
 com:
   vanchondo:
     recaptcha:
-      endpoint: https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s&remoteip=%s
+#      endpoint: https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s&remoteip=%s
+      endpoint: https://www.google.com/recaptcha/api/siteverify
       secret: 6LeCxtUmAAAAAAZ9FytFozVvVktHgBfRqCiKI8gv
       threshold: 0.5
       max_attempt: 4
