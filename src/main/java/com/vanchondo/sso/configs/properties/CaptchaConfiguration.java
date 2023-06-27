@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 public class CaptchaConfiguration {
   private String endpoint;
-  private String secretKey;
+  private String secret;
   private double threshold;
   private int maxAttempt;
   private int maxAttemptExpiration;

@@ -14,6 +14,7 @@ import com.vanchondo.sso.exceptions.BadRequestException;
 import com.vanchondo.sso.services.AuthenticationService;
 import com.vanchondo.sso.services.CaptchaValidatorService;
 import com.vanchondo.sso.services.UserService;
+import com.vanchondo.sso.utilities.NetworkUtil;
 import com.vanchondo.sso.utilities.RegexConstants;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,8 +59,7 @@ public class LoginController {
     public TokenDTO login(@Valid @RequestBody LoginDTO login, HttpServletRequest request) throws AuthenticationException {
         log.info("::login::Entering login endpoint for username={}", login.getUsername());
         sanitizeLoginDto(login);
-//        if (captchaValidatorService.validateCaptcha(login.getCaptchaResponse(), NetworkUtil.getClientIp(request))) {
-        if (captchaValidatorService.validateCaptcha(login.getCaptchaResponse())) {
+        if (captchaValidatorService.validateCaptcha(login.getCaptchaResponse(), NetworkUtil.getClientIp(request))) {
             return authenticationService.login(login);
         }
         else {
