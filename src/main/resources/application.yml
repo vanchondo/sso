@@ -20,7 +20,7 @@ com:
     recaptcha:
 #      endpoint: https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s&remoteip=%s
       endpoint: https://www.google.com/recaptcha/api/siteverify
-      secret: 6LeCxtUmAAAAAAZ9FytFozVvVktHgBfRqCiKI8gv
+      secret: ENC(OgI39ZGk6+gw2EWJZrjQ2AH7SlPS2449EYJ9/fP5rg+fnBROWuKVsPF2miDbYBEJSKE5rDGEtFI=)
       threshold: 0.5
       max_attempt: 4
       max_attempt_expiration: 4
