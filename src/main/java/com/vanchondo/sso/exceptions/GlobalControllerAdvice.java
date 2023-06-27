@@ -35,6 +35,12 @@ public class GlobalControllerAdvice {
         return buildResponse(HttpStatus.BAD_REQUEST, messages, request);
     }
 
+    @ExceptionHandler(ReCaptchaInvalidException.class)
+    public ResponseEntity<ErrorDTO> handle(ReCaptchaInvalidException ex, WebRequest request) {
+        log.info(logMessage, ex.getMessage(), ex);
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorDTO> handle(BadRequestException ex, WebRequest request) {
         log.info(logMessage, ex.getMessage(), ex);

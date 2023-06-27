@@ -10,12 +10,16 @@ import com.vanchondo.sso.dtos.security.LoginDTO;
 import com.vanchondo.sso.dtos.security.TokenDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
+import com.vanchondo.sso.exceptions.BadRequestException;
 import com.vanchondo.sso.services.AuthenticationService;
+import com.vanchondo.sso.services.CaptchaValidatorService;
 import com.vanchondo.sso.services.UserService;
+import com.vanchondo.sso.utilities.NetworkUtil;
 import com.vanchondo.sso.utilities.RegexConstants;
 import java.util.HashMap;
 import java.util.Map;
 import javax.security.sasl.AuthenticationException;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -36,6 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
     private final UserService userService;
     private final AuthenticationService authenticationService;
+    private final CaptchaValidatorService captchaValidatorService;
 
     @PostMapping(value = "register")
     public ResponseEntity<UserDTO> saveUser(@Valid @RequestBody SaveUserDTO user){
@@ -51,10 +56,15 @@ public class LoginController {
     }
 
     @PostMapping("login")
-    public TokenDTO login(@Valid @RequestBody LoginDTO login) throws AuthenticationException {
+    public TokenDTO login(@Valid @RequestBody LoginDTO login, HttpServletRequest request) throws AuthenticationException {
         log.info("::login::Entering login endpoint for username={}", login.getUsername());
         sanitizeLoginDto(login);
-        return authenticationService.login(login);
+        if (captchaValidatorService.validateCaptcha(login.getCaptchaResponse(), NetworkUtil.getClientIp(request))) {
+            return authenticationService.login(login);
+        }
+        else {
+            throw new BadRequestException("Captcha response is incorrect");
+        }
     }
 
     @GetMapping("currentUser")

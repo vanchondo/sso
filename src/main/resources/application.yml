@@ -17,6 +17,12 @@ mail:
 
 com:
   vanchondo:
+    recaptcha:
+      endpoint: https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s&remoteip=%s
+      secret: ENC(Ulx1MVux0EjV9R8eehm+6DMMLLhYswMbG5ehzRHW/HFCJr1QvcZnsegc8p4Dgee/Hf8liCYqmCI=)
+      threshold: 0.5
+      max_attempt: 4
+      max_attempt_expiration: 4
     login:
       issuer: sso-svc
       # Minutes
