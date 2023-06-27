@@ -56,4 +56,8 @@ dependencies {
 bootRun {
     systemProperty "spring.profiles.active", findProperty("spring.profiles.active")
     systemProperty "jasypt.encryptor.password", findProperty("jasypt.encryptor.password")
+    jvmArgs = [
+            "-Dspring.profiles.active=$System.env.SPRING_PROFILE",
+            "-Djasypt.encryptor.password=$System.env.JASYPT_SECRET_KEY"
+    ]
 }
