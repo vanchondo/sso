@@ -1,9 +1,6 @@
 package com.vanchondo.sso.controllers;
 
 import static com.vanchondo.sso.utilities.Sanitize.sanitize;
-import static com.vanchondo.sso.utilities.Sanitize.sanitizeCurrentUserDTO;
-import static com.vanchondo.sso.utilities.Sanitize.sanitizeLoginDto;
-import static com.vanchondo.sso.utilities.Sanitize.sanitizeSaveUserDTO;
 
 import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.dtos.security.LoginDTO;
@@ -44,7 +41,6 @@ public class LoginController {
 
     @PostMapping(value = "register")
     public ResponseEntity<UserDTO> saveUser(@Valid @RequestBody SaveUserDTO user){
-        sanitizeSaveUserDTO(user);
         UserDTO dto = userService.saveUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
@@ -58,7 +54,6 @@ public class LoginController {
     @PostMapping("login")
     public TokenDTO login(@Valid @RequestBody LoginDTO login, HttpServletRequest request) throws AuthenticationException {
         log.info("::login::Entering login endpoint for username={}", login.getUsername());
-        sanitizeLoginDto(login);
         if (captchaValidatorService.validateCaptcha(login.getCaptchaResponse(), NetworkUtil.getClientIp(request))) {
             return authenticationService.login(login);
         }
@@ -70,7 +65,6 @@ public class LoginController {
     @GetMapping("currentUser")
     public CurrentUserDTO getCurrentUser(@RequestAttribute("currentUser") CurrentUserDTO currentUser){
         log.info("::getCurrentUser::Entering getCurrentUser endpoint for username={}", currentUser.getUsername());
-        sanitizeCurrentUserDTO(currentUser);
         return currentUser;
     }
 
@@ -80,6 +74,7 @@ public class LoginController {
         Map<String, String> regexMap = new HashMap<>();
         regexMap.put("USERNAME_REGEX", RegexConstants.USERNAME_REGEX);
         regexMap.put("PASSWORD_REGEX", RegexConstants.PASSWORD_REGEX);
+        regexMap.put("EMAIL_REGEX", RegexConstants.EMAIL_REGEX);
         return regexMap;
     }
 }

@@ -1,9 +1,7 @@
 package com.vanchondo.sso.controllers;
 
 import static com.vanchondo.sso.utilities.Sanitize.sanitize;
-import static com.vanchondo.sso.utilities.Sanitize.sanitizeCurrentUserDTO;
 import static com.vanchondo.sso.utilities.Sanitize.sanitizeDeleteUserDTO;
-import static com.vanchondo.sso.utilities.Sanitize.sanitizeUpdateUserDTO;
 
 import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.dtos.users.DeleteUserDTO;
@@ -34,8 +32,6 @@ public class UserController {
 
     @PutMapping(value = "")
     public ResponseEntity<UserDTO> updateUser(@Valid @RequestBody UpdateUserDTO user, @RequestAttribute("currentUser") CurrentUserDTO currentUser){
-        sanitizeUpdateUserDTO(user);
-        sanitizeCurrentUserDTO(currentUser);
         UserDTO dto = userService.updateUser(user, currentUser);
         return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
@@ -43,7 +39,6 @@ public class UserController {
     @DeleteMapping(value = "")
     public void deleteUser(@Valid @RequestBody DeleteUserDTO user, @RequestAttribute("currentUser") CurrentUserDTO currentUser){
         sanitizeDeleteUserDTO(user);
-        sanitizeCurrentUserDTO(currentUser);
         userService.deleteUser(user, currentUser);
     }
 

@@ -1,7 +1,6 @@
 package com.vanchondo.sso.dtos.users;
 
 import com.vanchondo.sso.utilities.RegexConstants;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import lombok.Data;
@@ -13,7 +12,7 @@ public class SaveUserDTO {
     private String username;
 
     @NotNull (message = "Email is required")
-    @Email (message = "Email not valid")
+    @Pattern(regexp = RegexConstants.EMAIL_REGEX, message = "Email not valid")
     private String email;
 
     @NotNull (message = "Password is required")
