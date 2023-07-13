@@ -26,8 +26,8 @@ dependencies {
     implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: "${swagger_version}"
 
     implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.+'
-//    implementation group: 'org.springframework.security', name: 'spring-security-web', version: '5.7.+'
 
+    implementation group: 'org.aspectj', name:'aspectjweaver', version:'1.9.+'
 
     implementation group: 'com.github.ulisesbocchio', name: 'jasypt-spring-boot-starter', version: '3.0.4'
 

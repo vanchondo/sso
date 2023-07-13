@@ -1,25 +1,16 @@
 package com.vanchondo.sso.controllers;
 
-import static com.vanchondo.sso.utilities.Sanitize.sanitize;
-
+import com.vanchondo.sso.aspect.ValidateCaptcha;
 import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.dtos.security.LoginDTO;
 import com.vanchondo.sso.dtos.security.TokenDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
-import com.vanchondo.sso.exceptions.BadRequestException;
 import com.vanchondo.sso.services.AuthenticationService;
 import com.vanchondo.sso.services.CaptchaValidatorService;
 import com.vanchondo.sso.services.UserService;
-import com.vanchondo.sso.utilities.NetworkUtil;
 import com.vanchondo.sso.utilities.RegexConstants;
-import java.util.HashMap;
-import java.util.Map;
-import javax.security.sasl.AuthenticationException;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +20,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+
+import javax.security.sasl.AuthenticationException;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.vanchondo.sso.utilities.Sanitize.sanitize;
 
 @RestController
 @RequestMapping("/")
@@ -51,15 +54,11 @@ public class LoginController {
         return ResponseEntity.ok().build();
     }
 
+    @ValidateCaptcha
     @PostMapping("login")
     public TokenDTO login(@Valid @RequestBody LoginDTO login, HttpServletRequest request) throws AuthenticationException {
         log.info("::login::Entering login endpoint for username={}", login.getUsername());
-        if (captchaValidatorService.validateCaptcha(login.getCaptchaResponse(), NetworkUtil.getClientIp(request))) {
-            return authenticationService.login(login);
-        }
-        else {
-            throw new BadRequestException("Captcha response is incorrect");
-        }
+        return authenticationService.login(login);
     }
 
     @GetMapping("currentUser")
