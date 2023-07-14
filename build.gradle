@@ -5,7 +5,7 @@ plugins {
 
 group 'com.vanchondo.sso'
 version '1.0-SNAPSHOT'
-sourceCompatibility= '1.11'
+sourceCompatibility= '1.17'
 
 def lombok_version = '1.18.+'
 def springBoot_version = '2.7.+'
