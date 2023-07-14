@@ -1,4 +1,4 @@
-FROM openjdk:11
+FROM openjdk:17
 
 ARG secret_key
 ENV JASYPT_SECRET_KEY=$secret_key
