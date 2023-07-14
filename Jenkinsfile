@@ -1,9 +1,9 @@
 #!groovy
 pipeline {
-    agent any
     tools {
         jdk 'Java17-Temurin'
     }
+    agent any
     environment {
         CREDENTIALS = credentials('docker-registry-credentials')
         app_name = 'sso-svc'
