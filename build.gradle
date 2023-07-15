@@ -5,8 +5,10 @@ plugins {
 
 group 'com.vanchondo.sso'
 version '1.0-SNAPSHOT'
-sourceCompatibility= '1.17'
-targetCompatibility= '1.17'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+}
 
 def lombok_version = '1.18.+'
 def springBoot_version = '2.7.+'
@@ -18,50 +20,46 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-parent', version: "${springBoot_version}", ext: 'pom'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: "${springBoot_version}"
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb', version: "${springBoot_version}"
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: "${springBoot_version}"
+    implementation platform("org.springframework.boot:spring-boot-dependencies:${springBoot_version}")
+    implementation "org.springframework.boot:spring-boot-starter-web:${springBoot_version}"
+    implementation "org.springframework.boot:spring-boot-starter-data-mongodb:${springBoot_version}"
+    implementation "org.springframework.boot:spring-boot-starter-validation:${springBoot_version}"
 
-    implementation group: 'io.springfox', name: 'springfox-boot-starter', version: "${swagger_version}"
-    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: "${swagger_version}"
+    implementation "io.springfox:springfox-boot-starter:${swagger_version}"
+    implementation "io.springfox:springfox-swagger-ui:${swagger_version}"
 
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.+'
+    implementation "org.springframework.security:spring-security-crypto:5.7.+"
+    implementation "com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4"
+    implementation "org.aspectj:aspectjweaver:1.9.+"
+    implementation "org.apache.commons:commons-lang3:3.12.+"
+    compileOnly "org.projectlombok:lombok:${lombok_version}"
+    annotationProcessor "org.projectlombok:lombok:${lombok_version}"
 
-    implementation group: 'org.aspectj', name:'aspectjweaver', version:'1.9.+'
-
-    implementation group: 'com.github.ulisesbocchio', name: 'jasypt-spring-boot-starter', version: '3.0.4'
-
-    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: "${jsonwebtoken_version}"
-    implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: "${jsonwebtoken_version}"
-    implementation group: 'io.jsonwebtoken', name: 'jjwt-gson', version: "${jsonwebtoken_version}"
-
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.+'
-
-    compileOnly group: 'org.projectlombok', name: 'lombok', version: "${lombok_version}"
-    annotationProcessor group: 'org.projectlombok', name:'lombok', version: "${lombok_version}"
+    implementation "io.jsonwebtoken:jjwt-api:${jsonwebtoken_version}"
+    implementation "io.jsonwebtoken:jjwt-impl:${jsonwebtoken_version}"
+    implementation "io.jsonwebtoken:jjwt-gson:${jsonwebtoken_version}"
 
     // OWASP
-    implementation group: 'com.googlecode.owasp-java-html-sanitizer', name: 'owasp-java-html-sanitizer', version: '20220608.1'
+    implementation "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20220608.1"
     // Java mail
-    implementation 'org.eclipse.angus:angus-mail:2.0.2'
+    implementation "org.eclipse.angus:angus-mail:2.0.2"
     // Freemarker
-    implementation 'org.freemarker:freemarker:2.3.32'
+    implementation "org.freemarker:freemarker:2.3.32"
 
     // Test libraries
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: "${springBoot_version}"
-    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: "${lombok_version}"
-    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombok_version}"
+    testImplementation "org.springframework.boot:spring-boot-starter-test:${springBoot_version}"
+    testCompileOnly "org.projectlombok:lombok:${lombok_version}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombok_version}"
 
 }
 
 bootRun {
     systemProperty "spring.profiles.active", findProperty("spring.profiles.active")
     systemProperty "jasypt.encryptor.password", findProperty("jasypt.encryptor.password")
-    jvmArgs = [
-            "-Dspring.profiles.active=$System.env.SPRING_PROFILE",
-            "-Djasypt.encryptor.password=$System.env.JASYPT_SECRET_KEY"
-    ]
+    jvmArgs([
+        "-Dspring.profiles.active=${System.getenv('SPRING_PROFILE')}",
+        "-Djasypt.encryptor.password=${System.getenv('JASYPT_SECRET_KEY')}"
+    ])
 }
 
 test {
