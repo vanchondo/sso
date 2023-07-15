@@ -1,0 +1,14 @@
+{
+    "_id": "2b615315-e2bc-492a-b963-6a3c096a587d",
+    "name": "Cloudflare",
+    "default": false,
+    "sortNum": 20000,
+    "created": "2023-07-13T17:51:17.499Z",
+    "modified": "2023-07-13T17:51:17.499Z",
+    "data": [
+        {
+            "name": "host",
+            "value": "https://sso.victoranchondo.com"
+        }
+    ]
+}

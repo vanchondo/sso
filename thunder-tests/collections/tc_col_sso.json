@@ -1,0 +1,194 @@
+{
+    "_id": "f05919d4-83ba-46cb-8507-5ccb663bde77",
+    "colName": "SSO",
+    "created": "2023-07-13T17:51:57.517Z",
+    "sortNum": 10000,
+    "folders": [
+        {
+            "_id": "c8d0f12d-b229-4554-8b34-56d456c48c13",
+            "name": "/login",
+            "containerId": "",
+            "created": "2023-07-15T05:03:45.655Z",
+            "sortNum": 10000
+        },
+        {
+            "_id": "1ce4d20f-f1a4-4ebf-8201-92abe2255be6",
+            "name": "200",
+            "containerId": "c8d0f12d-b229-4554-8b34-56d456c48c13",
+            "created": "2023-07-15T05:04:06.807Z",
+            "sortNum": 20000
+        },
+        {
+            "_id": "d4407ba7-19ef-41ca-ae92-e4e414f338ed",
+            "name": "400",
+            "containerId": "c8d0f12d-b229-4554-8b34-56d456c48c13",
+            "created": "2023-07-15T05:04:19.057Z",
+            "sortNum": 30000
+        },
+        {
+            "_id": "461d4dd1-be40-45cb-a4ba-9c82f868b8e5",
+            "name": "401",
+            "containerId": "c8d0f12d-b229-4554-8b34-56d456c48c13",
+            "created": "2023-07-15T05:04:48.756Z",
+            "sortNum": 40000
+        }
+    ],
+    "requests": [
+        {
+            "_id": "7a1a2fbd-cf0b-4820-bdbb-7ce42ed13c6d",
+            "colId": "f05919d4-83ba-46cb-8507-5ccb663bde77",
+            "containerId": "1ce4d20f-f1a4-4ebf-8201-92abe2255be6",
+            "name": "Login successful",
+            "url": "{{host}}/login",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2023-07-13T17:52:15.440Z",
+            "modified": "2023-07-15T05:07:51.553Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"username\" : \"vanchondo\",\n    \"password\" : \"password\",\n    \"captchaResponse\": \"{{RECAPTCHA_SECRET_KEY}}\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                }
+            ]
+        },
+        {
+            "_id": "c11ee7d0-90af-4b41-ac52-8431f7341fb8",
+            "colId": "f05919d4-83ba-46cb-8507-5ccb663bde77",
+            "containerId": "461d4dd1-be40-45cb-a4ba-9c82f868b8e5",
+            "name": "Bad credentials",
+            "url": "{{host}}/login",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2023-07-15T04:57:55.319Z",
+            "modified": "2023-07-15T05:09:04.730Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"username\" : \"vanchondo\",\n    \"password\" : \"anotherPassword\",\n    \"captchaResponse\": \"{{RECAPTCHA_SECRET_KEY}}\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "401"
+                }
+            ]
+        },
+        {
+            "_id": "a787fcee-7aff-436e-afd6-549e31ace45f",
+            "colId": "f05919d4-83ba-46cb-8507-5ccb663bde77",
+            "containerId": "d4407ba7-19ef-41ca-ae92-e4e414f338ed",
+            "name": "Invalid username",
+            "url": "{{host}}/login",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2023-07-15T05:01:28.007Z",
+            "modified": "2023-07-15T05:08:30.431Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"username\" : \"a\",\n    \"password\" : \"password\",\n    \"captchaResponse\": \"{{RECAPTCHA_SECRET_KEY}}\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "400"
+                }
+            ]
+        },
+        {
+            "_id": "076ddde2-90ac-488a-bded-afc6ba635858",
+            "colId": "f05919d4-83ba-46cb-8507-5ccb663bde77",
+            "containerId": "d4407ba7-19ef-41ca-ae92-e4e414f338ed",
+            "name": "Bad captcha",
+            "url": "{{host}}/login",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2023-07-15T05:04:23.428Z",
+            "modified": "2023-07-15T05:08:11.760Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"username\" : \"vanchondo\",\n    \"password\" : \"password\",\n    \"captchaResponse\": \"asdfas\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "400"
+                }
+            ]
+        },
+        {
+            "_id": "3e300b95-3e61-4a4b-b7e4-275f0f3ae3b8",
+            "colId": "f05919d4-83ba-46cb-8507-5ccb663bde77",
+            "containerId": "d4407ba7-19ef-41ca-ae92-e4e414f338ed",
+            "name": "Invalid password",
+            "url": "{{host}}/login",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2023-07-15T05:05:25.895Z",
+            "modified": "2023-07-15T05:08:44.511Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"username\" : \"vanchondo\",\n    \"password\" : \"p\",\n    \"captchaResponse\": \"{{RECAPTCHA_SECRET_KEY}}\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "400"
+                }
+            ]
+        },
+        {
+            "_id": "7253fc76-663b-41f6-a9b7-78a3cf494a8a",
+            "colId": "f05919d4-83ba-46cb-8507-5ccb663bde77",
+            "containerId": "d4407ba7-19ef-41ca-ae92-e4e414f338ed",
+            "name": "Invalid username and password",
+            "url": "{{host}}/login",
+            "method": "POST",
+            "sortNum": 40000,
+            "created": "2023-07-15T05:05:53.646Z",
+            "modified": "2023-07-15T05:08:53.723Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"username\" : \"$#@@#$!@$@#\",\n    \"password\" : \"p\",\n    \"captchaResponse\": \"{{RECAPTCHA_SECRET_KEY}}\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "400"
+                }
+            ]
+        }
+    ]
+}
