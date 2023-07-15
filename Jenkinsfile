@@ -11,7 +11,9 @@ pipeline {
     }
     stages {
         stage('Java version') {
-            sh 'java --version'
+            steps {
+                sh 'java --version'
+            }
         }
         stage('Gradle Build') {
             steps {
