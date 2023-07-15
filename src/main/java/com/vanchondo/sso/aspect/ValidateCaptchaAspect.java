@@ -10,7 +10,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.jasypt.encryption.StringEncryptor;
-import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -44,14 +43,8 @@ public class ValidateCaptchaAspect {
 
     public void validateCaptcha(String captchaResponse) {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        String response = null;
-        try {
-            response = encryptor.decrypt(captchaResponse);
-        } catch (EncryptionOperationNotPossibleException ex) {
-            log.info("::validateCaptcha::captcha response is not encrypted.");
-        }
 
-        if (!captchaConfiguration.getSecret().equals(response)){
+        if (!captchaConfiguration.getSecret().equals(captchaResponse)){
             // Validate captcha response, if is invalid, it throws a BadRequest
             captchaValidatorService.validateCaptcha(captchaResponse, NetworkUtil.getClientIp(request));
         }
