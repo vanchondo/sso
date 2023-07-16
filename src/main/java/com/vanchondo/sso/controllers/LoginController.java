@@ -31,8 +31,6 @@ import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.vanchondo.sso.utilities.Sanitize.sanitize;
-
 @RestController
 @RequestMapping("/")
 @AllArgsConstructor
@@ -51,7 +49,7 @@ public class LoginController {
     @PostMapping(value = "validate")
     public ResponseEntity<UserDTO> validateUser(@RequestParam("email") String email, @RequestParam("token") String token) {
         log.info("::validateUser::Entering validate endpoint for email={} token={}", email, token);
-        userService.validateUser(sanitize(email), sanitize(token));
+        userService.validateUser(email, token);
         return ResponseEntity.ok().build();
     }
 
