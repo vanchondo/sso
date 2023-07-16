@@ -15,7 +15,7 @@ server:
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://${spring.data.mongodb.username}:${spring.data.mongodb.password}@192.168.3.8:27017/?retryWrites=true&w=majority
+      uri: mongodb://${spring.data.mongodb.username}:${spring.data.mongodb.password}@192.168.3.8:27017/?retryWrites=true&w=majority
       database: tfm
       username: ENC(fnSskThAoaH64tJdfjlJQiilCOIHXiuH)
       password: ENC(FurzDJnIQj+2f1P3mGyscq300lFDHuLY/rJn5eQVGpM=)
