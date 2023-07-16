@@ -31,6 +31,20 @@
             "containerId": "c8d0f12d-b229-4554-8b34-56d456c48c13",
             "created": "2023-07-15T05:04:48.756Z",
             "sortNum": 40000
+        },
+        {
+            "_id": "f0304198-c79d-4961-9227-acbf5a65e153",
+            "name": "/register",
+            "containerId": "",
+            "created": "2023-07-15T05:21:50.138Z",
+            "sortNum": 50000
+        },
+        {
+            "_id": "41faa1f6-08b7-482e-98ce-0ce7481cf450",
+            "name": "200",
+            "containerId": "f0304198-c79d-4961-9227-acbf5a65e153",
+            "created": "2023-07-15T05:21:58.506Z",
+            "sortNum": 60000
         }
     ],
     "requests": [
@@ -189,6 +203,25 @@
                     "value": "400"
                 }
             ]
+        },
+        {
+            "_id": "cfb02454-786c-4e90-80fc-8ed2736ece92",
+            "colId": "f05919d4-83ba-46cb-8507-5ccb663bde77",
+            "containerId": "41faa1f6-08b7-482e-98ce-0ce7481cf450",
+            "name": "register",
+            "url": "{{host}}/register",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2023-07-15T05:22:11.280Z",
+            "modified": "2023-07-16T01:43:54.801Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"username\" : \"vanchondo\",\n    \"password\" : \"password\",\n    \"email\" : \"eduardoanchondo@gmail.com\"\n}",
+                "form": []
+            },
+            "tests": []
         }
     ]
 }

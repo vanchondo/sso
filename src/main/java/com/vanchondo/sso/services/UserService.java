@@ -57,7 +57,7 @@ public class UserService {
 
     public void validateUser(String email, String token) {
         String methodName="::validateUser::";
-        log.debug("{}Trying to validate email={} token={}", methodName, email, token);
+        log.info("{}Trying to validate email={} token={}", methodName, email, token);
         if (StringUtils.isEmpty(token) || StringUtils.isEmpty(email)) {
             log.error("{}Email and/or token are null", methodName);
             throw new NotFoundException("User validation not found");
@@ -68,7 +68,7 @@ public class UserService {
             throw new NotFoundException("User validation not found");
         }
         if (token.equals(entity.getVerificationToken())) {
-            log.debug("{}Activating user", methodName);
+            log.info("{}Activating user", methodName);
             entity.setActive(true);
             entity.setLastUpdatedAt(LocalDateTime.now());
             entity.setVerificationToken(null);

@@ -50,7 +50,7 @@ public class LoginController {
 
     @PostMapping(value = "validate")
     public ResponseEntity<UserDTO> validateUser(@RequestParam("email") String email, @RequestParam("token") String token) {
-        log.debug("::validateUser::Entering validate endpoint for email={} token={}", email, token);
+        log.info("::validateUser::Entering validate endpoint for email={} token={}", email, token);
         userService.validateUser(sanitize(email), sanitize(token));
         return ResponseEntity.ok().build();
     }
