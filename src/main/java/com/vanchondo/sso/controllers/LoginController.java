@@ -38,6 +38,7 @@ public class LoginController {
     private final UserService userService;
     private final AuthenticationService authenticationService;
 
+    @ValidateCaptcha
     @PostMapping(value = "register")
     public ResponseEntity<UserDTO> saveUser(@Valid @RequestBody SaveUserDTO user){
         UserDTO dto = userService.saveUser(user);

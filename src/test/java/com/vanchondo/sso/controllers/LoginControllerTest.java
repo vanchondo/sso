@@ -1,28 +1,18 @@
 package com.vanchondo.sso.controllers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.vanchondo.sso.configs.properties.LoginConfiguration;
 import com.vanchondo.sso.dtos.ErrorDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.repositories.UserRepository;
 import com.vanchondo.sso.services.AuthenticationService;
-import com.vanchondo.sso.services.CaptchaValidatorService;
 import com.vanchondo.sso.services.UserService;
 import com.vanchondo.sso.utilities.Mapper;
 import com.vanchondo.sso.utilities.ObjectFactory;
 import com.vanchondo.sso.utilities.RegexConstants;
-import java.util.Map;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +26,18 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @WebMvcTest(value = LoginController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @Import(LoginConfiguration.class)
@@ -46,8 +48,6 @@ public class LoginControllerTest {
   private UserService userService;
   @MockBean
   private AuthenticationService authenticationService;
-  @MockBean
-  private CaptchaValidatorService captchaValidatorService;
   @MockBean
   private UserRepository userRepository;
 
@@ -69,7 +69,7 @@ public class LoginControllerTest {
     ErrorDTO response = Mapper.readValue(responseString, new TypeReference<>(){});
     assertNotNull(response);
     assertFalse(CollectionUtils.isEmpty(response.getMessages()));
-    assertEquals(3, response.getMessages().size());
+    assertEquals(4, response.getMessages().size());
     assertEquals(HttpStatus.BAD_REQUEST.getReasonPhrase(), response.getError());
     assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode());
     assertTrue(response.getMessages().contains("Username is required"));

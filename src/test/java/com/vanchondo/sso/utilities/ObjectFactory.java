@@ -6,19 +6,25 @@ public abstract class ObjectFactory {
   private ObjectFactory() {}
 
   public static SaveUserDTO createSaveUserDTOWithInvalidProperties() {
-    return new SaveUserDTO(
+    SaveUserDTO dto = new SaveUserDTO(
         "inv@lidUserN@ame$",
         "notAnEmail.com",
         "sPass" // short password
     );
+    dto.setCaptchaResponse("captchaResponse");
+
+    return dto;
   }
 
   public static SaveUserDTO createSaveUserDTO() {
-    return new SaveUserDTO(
+    SaveUserDTO dto = new SaveUserDTO(
         "validUsername",
         "victor@email.com",
         "myPassword"
     );
+    dto.setCaptchaResponse("captchaResponse");
+
+    return dto;
   }
 
 }
