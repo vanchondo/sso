@@ -11,16 +11,19 @@ import com.vanchondo.sso.exceptions.NotFoundException;
 import com.vanchondo.sso.mappers.UserDTOMapper;
 import com.vanchondo.sso.mappers.UserEntityMapper;
 import com.vanchondo.sso.repositories.UserRepository;
-import freemarker.template.TemplateException;
-import jakarta.mail.MessagingException;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import freemarker.template.TemplateException;
+import jakarta.mail.MessagingException;
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @Log4j2
@@ -53,18 +56,26 @@ public class UserService {
     }
 
     public void validateUser(String email, String token) {
+        String methodName="::validateUser::";
+        log.debug("{}Trying to validate email={} token={}", methodName, email, token);
         if (StringUtils.isEmpty(token) || StringUtils.isEmpty(email)) {
+            log.error("{}Email and/or token are null", methodName);
             throw new NotFoundException("User validation not found");
         }
         UserEntity entity = userRepository.findByEmail(email);
         if (entity == null) {
+            log.error("{}User registry not found", methodName);
             throw new NotFoundException("User validation not found");
         }
-        if (!entity.isActive() && token.equals(entity.getVerificationToken())) {
+        if (token.equals(entity.getVerificationToken())) {
+            log.debug("{}Activating user", methodName);
             entity.setActive(true);
             entity.setLastUpdatedAt(LocalDateTime.now());
             entity.setVerificationToken(null);
             userRepository.save(entity);
+        }
+        else {
+            log.error("{}Token not valid", methodName);
         }
     }
 
