@@ -1,16 +1,11 @@
 package com.vanchondo.sso.controllers;
 
-import static com.vanchondo.sso.utilities.Sanitize.sanitize;
-import static com.vanchondo.sso.utilities.Sanitize.sanitizeDeleteUserDTO;
-
 import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.dtos.users.DeleteUserDTO;
 import com.vanchondo.sso.dtos.users.UpdateUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.services.UserService;
-import javax.validation.Valid;
-import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +16,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+
+import javax.validation.Valid;
+
+import static com.vanchondo.sso.utilities.Sanitize.sanitizeDeleteUserDTO;
 
 @RestController
 @RequestMapping("/users")
@@ -44,7 +46,7 @@ public class UserController {
 
     @GetMapping(value="/available")
     public ResponseEntity<Void> available(@RequestParam(value = "username", required = false) String username, @RequestParam(value="email", required = false) String email) {
-        if (userService.available(sanitize(username), sanitize(email))) {
+        if (userService.available(username, email)) {
             return ResponseEntity.ok().build();
         }
         else {
