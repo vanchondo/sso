@@ -10,11 +10,6 @@ pipeline {
         version = "0.${BUILD_NUMBER}"
     }
     stages {
-        stage('Java version') {
-            steps {
-                sh 'java --version'
-            }
-        }
         stage('Gradle Build') {
             steps {
                 sh './gradlew clean build'
