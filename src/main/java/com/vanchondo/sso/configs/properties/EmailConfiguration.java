@@ -1,10 +1,11 @@
 package com.vanchondo.sso.configs.properties;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Properties;
 
@@ -22,6 +23,7 @@ public class EmailConfiguration {
     private String ssl;
     private String username;
     private String password;
+    private String from;
 
     public Properties getProperties() {
         Properties prop = new Properties();

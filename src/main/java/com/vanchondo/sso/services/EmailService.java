@@ -2,6 +2,9 @@ package com.vanchondo.sso.services;
 
 import com.vanchondo.sso.configs.properties.EmailConfiguration;
 import com.vanchondo.sso.utilities.EmailUtil;
+
+import org.springframework.stereotype.Service;
+
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -17,14 +20,13 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
-import java.util.Map;
-import org.springframework.stereotype.Service;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 @Service
 @Log4j2
@@ -46,10 +48,13 @@ public class EmailService {
     }
 
     public void sendEmail(String toEmail, String token) throws MessagingException, TemplateException, IOException {
+        String methodName = "::sendEmail::";
+        log.info("{}Sending validation email to={}", methodName, toEmail);
         Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(emailConfiguration.getUsername()));
+        message.setFrom(new InternetAddress(emailConfiguration.getFrom(), "NoReply"));
+        message.setReplyTo(InternetAddress.parse(emailConfiguration.getFrom(), false));
         message.setRecipients(
-                Message.RecipientType.TO, InternetAddress.parse(toEmail));
+                Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
         message.setSubject("Verificar cuenta");
         String link = String.format("https://login.victoranchondo.com/validate?email=%s&token=%s", EmailUtil.encode(toEmail), EmailUtil.encode(token));
 
@@ -59,10 +64,10 @@ public class EmailService {
 
         Multipart multipart = new MimeMultipart();
         multipart.addBodyPart(mimeBodyPart);
-
         message.setContent(multipart);
 
         Transport.send(message);
+        log.info("{}Email sent successfully to={}", methodName, toEmail);
     }
 
     private String getEmailBody(String link) throws IOException, TemplateException {

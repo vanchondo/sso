@@ -7,7 +7,6 @@ import com.vanchondo.sso.dtos.security.TokenDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.services.AuthenticationService;
-import com.vanchondo.sso.services.CaptchaValidatorService;
 import com.vanchondo.sso.services.UserService;
 import com.vanchondo.sso.utilities.RegexConstants;
 
@@ -38,7 +37,6 @@ import java.util.Map;
 public class LoginController {
     private final UserService userService;
     private final AuthenticationService authenticationService;
-    private final CaptchaValidatorService captchaValidatorService;
 
     @PostMapping(value = "register")
     public ResponseEntity<UserDTO> saveUser(@Valid @RequestBody SaveUserDTO user){

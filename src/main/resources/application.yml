@@ -8,12 +8,13 @@ mail:
     auth: true
     starttls:
       enable: true
-    host: smtp-mail.outlook.com
+    host: smtp-relay.brevo.com
     port: 587
     ssl:
-      trust: smtp-mail.outlook.com
-    username: ENC(Gjn/ileOQ4s7FaVYYWykG1tSC2ZXWAxTZGCtd3BovsLN0Kzv81XRDQ==)
-    password: ENC(4urs70afj8Avx+BgLkZQ2jhfCOv2O2DZweXWziq2aNc=)
+      trust: smtp-relay.brevo.com
+    username: ENC(sJVtsL+EAH+WNrQ9kN0R0Rt+QrdcawHdnY9P3aRiA96YqVIZyfZ0gw==)
+    from: no_replay@victoranchondo.com
+    password: ENC(pPwcntUESIURcyTkD4EQQXpx1MzSU55wDG8HIju08PYmqWD+IRNQyXjaV7jk21/oxpBI98BeMm+ajRJ2SOBwYjx/GPC7spc9wMAVaZValwj05YBfiOYqEZ8y3FsaV+Qbthq4VRgRZCk=)
 
 com:
   vanchondo:
