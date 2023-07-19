@@ -6,10 +6,8 @@ jasypt:
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://${spring.data.mongodb.username}:${spring.data.mongodb.password}@cluster0.xyagrwi.mongodb.net/?retryWrites=true&w=majority
-      database: tfm
-      username: ENC(fnSskThAoaH64tJdfjlJQiilCOIHXiuH)
-      password: ENC(FurzDJnIQj+2f1P3mGyscq300lFDHuLY/rJn5eQVGpM=)
+      uri: mongodb://root:toor@localhost:27017
+      database: sso
 
 com:
   vanchondo:
