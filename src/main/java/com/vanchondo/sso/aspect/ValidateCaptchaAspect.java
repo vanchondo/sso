@@ -8,7 +8,6 @@ import com.vanchondo.sso.utilities.NetworkUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.jasypt.encryption.StringEncryptor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -27,22 +26,26 @@ import java.util.Optional;
 public class ValidateCaptchaAspect {
 
     private final CaptchaValidatorService captchaValidatorService;
-    private final StringEncryptor encryptor;
     private final CaptchaConfiguration captchaConfiguration;
 
     @Around("@annotation(ValidateCaptcha)")
-    public Object CheckSecretHeader(ProceedingJoinPoint pjp) throws Throwable {
+    public Object validateCaptcha(ProceedingJoinPoint pjp) throws Throwable {
+        String methodName = "::validateCaptcha::";
+        log.info("{}Entering validating captcha annotation", methodName);
         CaptchaDTO dto = Optional.ofNullable((CaptchaDTO)pjp.getArgs()[0]).orElse(new CaptchaDTO());
 
         validateCaptcha(dto);
 
+        log.info("{}Captcha validation was successful, continue with the endpoint", methodName);
         return pjp.proceed();
     }
 
-    public void validateCaptcha(CaptchaDTO dto) {
+    private void validateCaptcha(CaptchaDTO dto) {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 
+        String methodName = "::validateCaptcha::";
         if (captchaConfiguration.getSecret().equals(dto.getCaptchaResponse())){
+            log.info("{}This request is for testing purposes, captcha secret provided", methodName);
             dto.setTest(true);
         }
         else {
