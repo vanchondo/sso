@@ -1,0 +1,15 @@
+{
+    "_id": "bb4675e8-5b20-4408-ad94-9f441cb70767",
+    "name": "(Global Env)",
+    "default": false,
+    "global": true,
+    "sortNum": -2,
+    "created": "2023-07-16T14:44:48.122Z",
+    "modified": "2023-07-16T14:44:48.122Z",
+    "data": [
+        {
+            "name": "secret",
+            "value": "secret.victoranchondo.com"
+        }
+    ]
+}

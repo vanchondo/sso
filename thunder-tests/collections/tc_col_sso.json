@@ -45,6 +45,20 @@
             "containerId": "f0304198-c79d-4961-9227-acbf5a65e153",
             "created": "2023-07-15T05:21:58.506Z",
             "sortNum": 60000
+        },
+        {
+            "_id": "8d023cdf-d7f0-4910-9a83-465e3ce2d7eb",
+            "name": "/validate",
+            "containerId": "",
+            "created": "2023-07-19T14:01:13.639Z",
+            "sortNum": 70000
+        },
+        {
+            "_id": "e7a54f0b-62ea-4d1f-a23d-103563e55871",
+            "name": "200",
+            "containerId": "8d023cdf-d7f0-4910-9a83-465e3ce2d7eb",
+            "created": "2023-07-19T14:01:19.239Z",
+            "sortNum": 80000
         }
     ],
     "requests": [
@@ -213,14 +227,39 @@
             "method": "POST",
             "sortNum": 30000,
             "created": "2023-07-15T05:22:11.280Z",
-            "modified": "2023-07-16T01:43:54.801Z",
+            "modified": "2023-07-19T14:00:36.493Z",
             "headers": [],
             "params": [],
             "body": {
                 "type": "json",
-                "raw": "{\n    \"username\" : \"vanchondo\",\n    \"password\" : \"password\",\n    \"email\" : \"eduardoanchondo@gmail.com\"\n}",
+                "raw": "{\n    \"username\" : \"mySuperUsername7\",\n    \"password\" : \"password\",\n    \"email\" : \"eduardoanchondo+test3@gmail.com\",\n    \"captchaResponse\": \"{{RECAPTCHA_SECRET_KEY}}\"\n}",
                 "form": []
             },
+            "tests": []
+        },
+        {
+            "_id": "e24bb44b-239c-4722-badc-ad7ab228bdbc",
+            "colId": "f05919d4-83ba-46cb-8507-5ccb663bde77",
+            "containerId": "e7a54f0b-62ea-4d1f-a23d-103563e55871",
+            "name": "validate",
+            "url": "{{host}}/validate?email=eduardoanchondo%2Btest3%40gmail.com&token={{RECAPTCHA_SECRET_KEY}}",
+            "method": "POST",
+            "sortNum": 60000,
+            "created": "2023-07-19T14:01:29.342Z",
+            "modified": "2023-07-19T14:04:37.203Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "email",
+                    "value": "eduardoanchondo%2Btest3%40gmail.com",
+                    "isPath": false
+                },
+                {
+                    "name": "token",
+                    "value": "{{RECAPTCHA_SECRET_KEY}}",
+                    "isPath": false
+                }
+            ],
             "tests": []
         }
     ]
