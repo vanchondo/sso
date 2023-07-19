@@ -8,7 +8,6 @@ import com.vanchondo.sso.utilities.NetworkUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.reflect.MethodSignature;
 import org.jasypt.encryption.StringEncryptor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -33,20 +32,22 @@ public class ValidateCaptchaAspect {
 
     @Around("@annotation(ValidateCaptcha)")
     public Object CheckSecretHeader(ProceedingJoinPoint pjp) throws Throwable {
-        MethodSignature signature  = (MethodSignature)pjp.getSignature();
         CaptchaDTO dto = Optional.ofNullable((CaptchaDTO)pjp.getArgs()[0]).orElse(new CaptchaDTO());
 
-        validateCaptcha(dto.getCaptchaResponse());
+        validateCaptcha(dto);
 
         return pjp.proceed();
     }
 
-    public void validateCaptcha(String captchaResponse) {
+    public void validateCaptcha(CaptchaDTO dto) {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 
-        if (!captchaConfiguration.getSecret().equals(captchaResponse)){
+        if (captchaConfiguration.getSecret().equals(dto.getCaptchaResponse())){
+            dto.setTest(true);
+        }
+        else {
             // Validate captcha response, if is invalid, it throws a BadRequest
-            captchaValidatorService.validateCaptcha(captchaResponse, NetworkUtil.getClientIp(request));
+            captchaValidatorService.validateCaptcha(dto.getCaptchaResponse(), NetworkUtil.getClientIp(request));
         }
 
     }

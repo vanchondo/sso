@@ -8,4 +8,5 @@ import javax.validation.constraints.NotEmpty;
 public class CaptchaDTO {
     @NotEmpty
     private String captchaResponse;
+    private boolean test;
 }

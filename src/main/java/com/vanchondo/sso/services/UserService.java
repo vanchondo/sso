@@ -39,10 +39,15 @@ public class UserService {
             entity.setActive(false);
             entity.setLastUpdatedAt(LocalDateTime.now());
             entity.setPassword(passwordEncoder.encode(entity.getPassword()));
-            entity.setVerificationToken(UUID.randomUUID().toString());
+            entity.setVerificationToken( dto.isTest()
+                    ? dto.getCaptchaResponse() // Sets captcha response as token
+                    : UUID.randomUUID().toString() // Generates a random uuid
+            );
             try {
                 entity = userRepository.save(entity);
-                emailService.sendEmail(entity.getEmail(), entity.getVerificationToken());
+                if (!dto.isTest()) {
+                    emailService.sendEmail(entity.getEmail(), entity.getVerificationToken());
+                }
             } catch (MessagingException | TemplateException | IOException e) {
                 userRepository.delete(entity);
                 log.error("::saveUser:: Error sending email to={}", entity.getEmail(), e);
