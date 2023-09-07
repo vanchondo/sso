@@ -115,6 +115,22 @@ public class LoginControllerTest {
   }
 
   @Test
+  public void testRegisterWhenSuccessSpecialEmail() throws Exception {
+    SaveUserDTO dto = ObjectFactory.createSaveUserDTO();
+    dto.setEmail("Dickens.8aaf0a8820b5@hotmail.com");
+    String responseString = mockMvc.perform(post("/register")
+            .content(Mapper.toJson(dto))
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(status().isCreated())
+        .andReturn().getResponse().getContentAsString();
+
+    UserDTO response = Mapper.readValue(responseString, new TypeReference<>(){});
+    assertNotNull(response);
+  }
+
+  @Test
   public void testRegex() throws Exception {
     String responseString = mockMvc.perform(get("/regex"))
         .andExpect(status().isOk())

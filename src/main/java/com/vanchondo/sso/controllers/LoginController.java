@@ -4,6 +4,7 @@ import com.vanchondo.sso.aspect.ValidateCaptcha;
 import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.dtos.security.LoginDTO;
 import com.vanchondo.sso.dtos.security.TokenDTO;
+import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.services.AuthenticationService;
@@ -46,9 +47,9 @@ public class LoginController {
     }
 
     @PostMapping(value = "validate")
-    public ResponseEntity<UserDTO> validateUser(@RequestParam("email") String email, @RequestParam("token") String token) {
-        log.info("::validateUser::Entering validate endpoint for email={} token={}", email, token);
-        userService.validateUser(email, token);
+    public ResponseEntity<UserDTO> validateUser(@RequestBody ValidateUserDTO user) {
+        log.info("::validateUser::Entering validate endpoint for user={}", user);
+        userService.validateUser(user);
         return ResponseEntity.ok().build();
     }
 

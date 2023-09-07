@@ -1,6 +1,7 @@
 package com.vanchondo.sso.services;
 
 import com.vanchondo.sso.dtos.security.CurrentUserDTO;
+import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.DeleteUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UpdateUserDTO;
@@ -60,7 +61,9 @@ public class UserService {
         }
     }
 
-    public void validateUser(String email, String token) {
+    public void validateUser(ValidateUserDTO userDTO) {
+        String email = userDTO.getEmail();
+        String token = userDTO.getToken();
         String methodName="::validateUser::";
         log.info("{}Trying to validate email={} token={}", methodName, email, token);
         if (StringUtils.isEmpty(token) || StringUtils.isEmpty(email)) {
@@ -104,16 +107,20 @@ public class UserService {
     }
 
     public boolean deleteUser(DeleteUserDTO dto, CurrentUserDTO currentUser){
+        String methodName = "::deleteUser::";
         UserEntity entity = userRepository.findByUsername(currentUser.getUsername());
         if (entity == null) {
+            log.warn("{}User not found for deletion. user={}", methodName, currentUser.getUsername());
             throw new NotFoundException("User not found");
         }
         else {
             if (passwordEncoder.matches(dto.getPassword(), entity.getPassword())){
                 userRepository.delete(entity);
+                log.info("{}User deleted successfully. user={}", methodName, currentUser.getUsername());
                 return true;
             }
             else {
+                log.warn("{}User cannot be deleted, password is not valid. user={}", methodName, currentUser.getUsername());
                 throw new ConflictException("Password is not valid");
             }
         }

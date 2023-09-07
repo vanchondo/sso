@@ -1,5 +1,6 @@
 package com.vanchondo.sso.controllers;
 
+import com.vanchondo.sso.aspect.ValidateCaptcha;
 import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.dtos.users.DeleteUserDTO;
 import com.vanchondo.sso.dtos.users.UpdateUserDTO;
@@ -22,8 +23,6 @@ import lombok.extern.log4j.Log4j2;
 
 import javax.validation.Valid;
 
-import static com.vanchondo.sso.utilities.Sanitize.sanitizeDeleteUserDTO;
-
 @RestController
 @RequestMapping("/users")
 @Log4j2
@@ -38,19 +37,19 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
 
+    @ValidateCaptcha
     @DeleteMapping(value = "")
-    public void deleteUser(@Valid @RequestBody DeleteUserDTO user, @RequestAttribute("currentUser") CurrentUserDTO currentUser){
-        sanitizeDeleteUserDTO(user);
-        userService.deleteUser(user, currentUser);
+    public ResponseEntity<Void> deleteUser(@Valid @RequestBody DeleteUserDTO user, @RequestAttribute("currentUser") CurrentUserDTO currentUser) {
+        log.info("::deleteUser::Entering deleteUser endpoint. user={}", currentUser.getUsername());
+        return userService.deleteUser(user, currentUser)
+            ? ResponseEntity.status(HttpStatus.OK).build()
+            : ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     @GetMapping(value="/available")
     public ResponseEntity<Void> available(@RequestParam(value = "username", required = false) String username, @RequestParam(value="email", required = false) String email) {
-        if (userService.available(username, email)) {
-            return ResponseEntity.ok().build();
-        }
-        else {
-            return ResponseEntity.badRequest().build();
-        }
+        return userService.available(username, email)
+            ? ResponseEntity.ok().build()
+            : ResponseEntity.badRequest().build();
     }
 }
