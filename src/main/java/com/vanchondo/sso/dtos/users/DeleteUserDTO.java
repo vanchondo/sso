@@ -2,12 +2,14 @@ package com.vanchondo.sso.dtos.users;
 
 import com.vanchondo.sso.dtos.security.CaptchaDTO;
 
-import lombok.Data;
-
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class DeleteUserDTO extends CaptchaDTO {
 
     @NotNull (message = "Password is required")
