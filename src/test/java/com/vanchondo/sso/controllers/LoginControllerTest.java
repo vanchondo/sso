@@ -1,5 +1,15 @@
 package com.vanchondo.sso.controllers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.vanchondo.sso.configs.properties.LoginConfiguration;
 import com.vanchondo.sso.dtos.ErrorDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
@@ -10,9 +20,7 @@ import com.vanchondo.sso.services.UserService;
 import com.vanchondo.sso.utilities.Mapper;
 import com.vanchondo.sso.utilities.ObjectFactory;
 import com.vanchondo.sso.utilities.RegexConstants;
-
 import com.fasterxml.jackson.core.type.TypeReference;
-
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,16 +35,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = LoginController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -125,6 +123,24 @@ public class LoginControllerTest {
         )
         .andExpect(status().isCreated())
         .andReturn().getResponse().getContentAsString();
+
+    UserDTO response = Mapper.readValue(responseString, new TypeReference<>(){});
+    assertNotNull(response);
+  }
+
+  @Test
+  public void testRegisterWhenSuccessSpecialUsername() throws Exception {
+    SaveUserDTO dto = ObjectFactory.createSaveUserDTO();
+    dto.setUsername("Michale.Schiller");
+    dto.setPassword("password");
+    dto.setEmail("Orlando.Prosacco22@gmail.com");
+    String responseString = mockMvc.perform(post("/register")
+        .content(Mapper.toJson(dto))
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+      )
+      .andExpect(status().isCreated())
+      .andReturn().getResponse().getContentAsString();
 
     UserDTO response = Mapper.readValue(responseString, new TypeReference<>(){});
     assertNotNull(response);
