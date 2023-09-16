@@ -2,11 +2,12 @@ package com.vanchondo.sso.dtos.security;
 
 import com.vanchondo.sso.utilities.RegexConstants;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+
 
 @Data
 @EqualsAndHashCode(callSuper = true)

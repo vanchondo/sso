@@ -12,19 +12,18 @@ import com.vanchondo.sso.exceptions.NotFoundException;
 import com.vanchondo.sso.mappers.UserDTOMapper;
 import com.vanchondo.sso.mappers.UserEntityMapper;
 import com.vanchondo.sso.repositories.UserRepository;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 import freemarker.template.TemplateException;
 import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 @Log4j2

@@ -12,7 +12,7 @@ java {
 }
 
 def lombok_version = '1.18.+'
-def springBoot_version = '2.7.+'
+def springBoot_version = '3.1.+'
 def jsonwebtoken_version = '0.11.+'
 def swagger_version = '3.0.+'
 
@@ -22,12 +22,14 @@ repositories {
 
 dependencies {
     implementation platform("org.springframework.boot:spring-boot-dependencies:${springBoot_version}")
-    implementation "org.springframework.boot:spring-boot-starter-web:${springBoot_version}"
+//    implementation "org.springframework.boot:spring-boot-starter-web:${springBoot_version}"
+    implementation "org.springframework.boot:spring-boot-starter-webflux:${springBoot_version}"
     implementation "org.springframework.boot:spring-boot-starter-data-mongodb:${springBoot_version}"
+    implementation "org.springframework.boot:spring-boot-starter-data-mongodb-reactive:${springBoot_version}"
+
     implementation "org.springframework.boot:spring-boot-starter-validation:${springBoot_version}"
 
     implementation "io.springfox:springfox-boot-starter:${swagger_version}"
-    implementation "io.springfox:springfox-swagger-ui:${swagger_version}"
 
     implementation "org.springframework.security:spring-security-crypto:5.7.+"
     implementation "com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4"

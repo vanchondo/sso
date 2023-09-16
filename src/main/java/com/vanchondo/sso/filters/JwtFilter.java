@@ -4,23 +4,32 @@ import com.vanchondo.sso.configs.properties.LoginConfiguration;
 import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.mappers.CurrentUserDTOMapper;
 import com.vanchondo.sso.services.AuthenticationService;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.WebFilterChain;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Optional;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.GenericFilterBean;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import reactor.core.publisher.Mono;
 
 @Component
-public class JwtFilter extends GenericFilterBean {
+@Order(1)
+public class JwtFilter implements WebFilter {
 
     private final LoginConfiguration loginConfiguration;
 
@@ -29,31 +38,35 @@ public class JwtFilter extends GenericFilterBean {
     }
 
     @Override
-    public void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
-            throws IOException, ServletException {
-        final HttpServletRequest request = (HttpServletRequest) req;
-        final HttpServletResponse response = (HttpServletResponse) res;
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        ServerHttpRequest request = exchange.getRequest();
+        ServerHttpResponse response = exchange.getResponse();
 
         String invalidTokenMessage = "Invalid Authorization Token";
-        if (isUnsecuredUrl(request.getRequestURI(), request.getMethod())) {
-            chain.doFilter(request, response);
-        } else if ("OPTIONS".equals(request.getMethod())) {
-            response.setStatus(HttpServletResponse.SC_OK);
-
-            chain.doFilter(req, res);
+        if (isUnsecuredUrl(request.getURI().getPath(), Objects.requireNonNull(request.getMethod()).toString())) {
+            return chain.filter(exchange);
+        } else if (HttpMethod.OPTIONS == request.getMethod()) {
+            response.setStatusCode(HttpStatus.OK);
+            return chain.filter(exchange);
         } else {
-            final String authHeader = request.getHeader("authorization");
-            final String authParam = request.getParameter("token");
-            if (StringUtils.isEmpty(authParam) && (authHeader == null || !authHeader
-                    .startsWith("Bearer "))) {
+            String authHeader = Optional.ofNullable(request.getHeaders().get(HttpHeaders.AUTHORIZATION))
+              .orElse(Collections.emptyList())
+              .stream().findFirst().orElse(Strings.EMPTY);
 
-                response.sendError(HttpStatus.UNAUTHORIZED.value(), invalidTokenMessage);
-                return;
+            String authParam = Optional.ofNullable(request.getQueryParams().get("token"))
+              .orElse(Collections.emptyList())
+              .stream().findFirst().orElse(Strings.EMPTY);
+
+            if (StringUtils.isEmpty(authParam) && (StringUtils.isEmpty(authHeader) || !authHeader.startsWith("Bearer "))) {
+                response.setStatusCode(HttpStatus.UNAUTHORIZED);
+                DataBuffer buffer = response.bufferFactory().wrap(invalidTokenMessage.getBytes(StandardCharsets.UTF_8));
+                // Write the error response
+                return exchange.getResponse().writeWith(Mono.just(buffer)).then(Mono.error(new RuntimeException(invalidTokenMessage)));
+
             }
             String token = StringUtils.isEmpty(authHeader) ? authParam : authHeader.substring(7);
 
             try {
-
                 final Claims claims = Jwts.parserBuilder()
                         .setSigningKey(
                                 AuthenticationService.getSigningKey(loginConfiguration.getSecretKey())
@@ -61,15 +74,17 @@ public class JwtFilter extends GenericFilterBean {
                         .parseClaimsJws(token)
                         .getBody();
                 CurrentUserDTO currentUser = CurrentUserDTOMapper.map(claims);
-                request.setAttribute("currentUser", currentUser);
+                exchange.getAttributes().put("currentUser", currentUser);
 //                response.addHeader("Access-Control-Expose-Headers", "Authorization");
 //                response.addHeader("Authorization", usersService.generateToken(currentUser).getToken());
             } catch (Exception e) {
-                response.sendError(HttpStatus.UNAUTHORIZED.value(), invalidTokenMessage);
-                return;
+                response.setStatusCode(HttpStatus.UNAUTHORIZED);
+                DataBuffer buffer = response.bufferFactory().wrap(invalidTokenMessage.getBytes(StandardCharsets.UTF_8));
+                // Write the error response
+                return exchange.getResponse().writeWith(Mono.just(buffer)).then(Mono.error(new RuntimeException(invalidTokenMessage)));
             }
 
-            chain.doFilter(req, res);
+            return chain.filter(exchange);
         }
     }
 

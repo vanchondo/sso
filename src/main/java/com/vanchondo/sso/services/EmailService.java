@@ -2,8 +2,13 @@ package com.vanchondo.sso.services;
 
 import com.vanchondo.sso.configs.properties.EmailConfiguration;
 import com.vanchondo.sso.utilities.EmailUtil;
-
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -11,6 +16,7 @@ import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
+import jakarta.mail.Message.RecipientType;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Multipart;
 import jakarta.mail.PasswordAuthentication;
@@ -21,12 +27,8 @@ import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
 import lombok.extern.log4j.Log4j2;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Service
 @Log4j2
@@ -46,6 +48,33 @@ public class EmailService {
             }
         });
     }
+
+    public Mono<Void> sendEmailReactive(String toEmail, String token) {
+        return Mono.fromCallable(() -> {
+            String methodName = "::sendEmail::";
+            log.info("{}Sending validation email to={}", methodName, toEmail);
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(emailConfiguration.getFrom(), "NoReply"));
+            message.setReplyTo(InternetAddress.parse(emailConfiguration.getFrom(), false));
+            message.setRecipients(
+              RecipientType.TO, InternetAddress.parse(toEmail, false));
+            message.setSubject("Verificar cuenta");
+            String link = String.format("https://login.victoranchondo.com/validate?email=%s&token=%s", EmailUtil.encode(toEmail), EmailUtil.encode(token));
+
+            String msg = getEmailBody(link);
+            MimeBodyPart mimeBodyPart = new MimeBodyPart();
+            mimeBodyPart.setContent(msg, "text/html; charset=utf-8");
+
+            Multipart multipart = new MimeMultipart();
+            multipart.addBodyPart(mimeBodyPart);
+            message.setContent(multipart);
+
+            Transport.send(message);
+            log.info("{}Email sent successfully to={}", methodName, toEmail);
+            return null;
+        }).subscribeOn(Schedulers.boundedElastic()).then(); // Use a separate thread pool for blocking operations
+    }
+
 
     public void sendEmail(String toEmail, String token) throws MessagingException, TemplateException, IOException {
         String methodName = "::sendEmail::";

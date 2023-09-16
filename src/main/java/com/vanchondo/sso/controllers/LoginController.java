@@ -8,6 +8,7 @@ import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.services.AuthenticationService;
+import com.vanchondo.sso.services.ReactiveUserService;
 import com.vanchondo.sso.services.UserService;
 import com.vanchondo.sso.utilities.RegexConstants;
 import org.springframework.http.HttpStatus;
@@ -20,27 +21,28 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.security.sasl.AuthenticationException;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/")
 @AllArgsConstructor
 @Log4j2
 public class LoginController {
+    private final ReactiveUserService reactiveUserService;
     private final UserService userService;
     private final AuthenticationService authenticationService;
 
     @ValidateCaptcha
     @PostMapping(value = "register")
-    public ResponseEntity<UserDTO> saveUser(@Valid @RequestBody SaveUserDTO user){
-        UserDTO dto = userService.saveUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+    public Mono<ResponseEntity<UserDTO>> saveUser(@Valid @RequestBody SaveUserDTO user){
+        return reactiveUserService.saveUser(user)
+          .map(dto -> ResponseEntity.status(HttpStatus.CREATED).body(dto));
     }
 
     @PostMapping(value = "validate")
@@ -52,7 +54,7 @@ public class LoginController {
 
     @ValidateCaptcha
     @PostMapping("login")
-    public TokenDTO login(@Valid @RequestBody LoginDTO login, HttpServletRequest request) throws AuthenticationException {
+    public TokenDTO login(@Valid @RequestBody LoginDTO login) throws AuthenticationException {
         log.info("::login::Entering login endpoint for username={}", login.getUsername());
         return authenticationService.login(login);
     }

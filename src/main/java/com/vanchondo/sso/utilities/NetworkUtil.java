@@ -1,8 +1,12 @@
 package com.vanchondo.sso.utilities;
 
-import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.web.server.ServerWebExchange;
+
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.util.Optional;
 
 public abstract class NetworkUtil {
 
@@ -10,13 +14,12 @@ public abstract class NetworkUtil {
 
   private NetworkUtil() {}
 
-  public static String getClientIp(HttpServletRequest request) {
-    if (request != null) {
-      String remoteAddr = request.getHeader(X_FORWARDED_FOR);
-      if (StringUtils.isEmpty(remoteAddr)) {
-        return request.getRemoteAddr();
-      }
-    }
-    return Strings.EMPTY;
+  public static String getClientIp(ServerWebExchange exchange) {
+      return Optional.ofNullable(exchange)
+        .map(ServerWebExchange::getRequest)
+        .map(ServerHttpRequest::getRemoteAddress)
+        .map(InetSocketAddress::getAddress)
+        .map(InetAddress::getHostAddress)
+        .orElse(Strings.EMPTY);
   }
 }
