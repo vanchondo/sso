@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ServerWebExchange;
 
 import javax.security.sasl.AuthenticationException;
 import java.util.HashMap;
@@ -40,7 +41,7 @@ public class LoginController {
 
     @ValidateCaptcha
     @PostMapping(value = "register")
-    public Mono<ResponseEntity<UserDTO>> saveUser(@Valid @RequestBody SaveUserDTO user){
+    public Mono<ResponseEntity<UserDTO>> saveUser(ServerWebExchange exchange, @Valid @RequestBody SaveUserDTO user){
         return reactiveUserService.saveUser(user)
           .map(dto -> ResponseEntity.status(HttpStatus.CREATED).body(dto));
     }
@@ -54,7 +55,7 @@ public class LoginController {
 
     @ValidateCaptcha
     @PostMapping("login")
-    public TokenDTO login(@Valid @RequestBody LoginDTO login) throws AuthenticationException {
+    public TokenDTO login(ServerWebExchange exchange, @Valid @RequestBody LoginDTO login) throws AuthenticationException {
         log.info("::login::Entering login endpoint for username={}", login.getUsername());
         return authenticationService.login(login);
     }

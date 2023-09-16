@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ServerWebExchange;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -37,7 +38,7 @@ public class UserController {
 
     @ValidateCaptcha
     @DeleteMapping(value = "")
-    public ResponseEntity<Void> deleteUser(@Valid @RequestBody DeleteUserDTO user, @RequestAttribute("currentUser") CurrentUserDTO currentUser) {
+    public ResponseEntity<Void> deleteUser(ServerWebExchange exchange, @Valid @RequestBody DeleteUserDTO user, @RequestAttribute("currentUser") CurrentUserDTO currentUser) {
         log.info("::deleteUser::Entering deleteUser endpoint. user={}", currentUser.getUsername());
         return userService.deleteUser(user, currentUser)
             ? ResponseEntity.status(HttpStatus.OK).build()

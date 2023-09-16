@@ -3,6 +3,7 @@ package com.vanchondo.sso.aspect;
 import com.vanchondo.sso.configs.properties.CaptchaConfiguration;
 import com.vanchondo.sso.dtos.security.CaptchaDTO;
 import com.vanchondo.sso.services.CaptchaValidatorService;
+import com.vanchondo.sso.utilities.NetworkUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -27,8 +28,8 @@ public class ValidateCaptchaAspect {
     public Object validateCaptcha(ProceedingJoinPoint pjp) throws Throwable {
         String methodName = "::validateCaptcha::";
         log.info("{}Entering validating captcha annotation", methodName);
-        CaptchaDTO dto = Optional.ofNullable((CaptchaDTO)pjp.getArgs()[0]).orElse(new CaptchaDTO());
-        ServerWebExchange exchange = null;
+        ServerWebExchange exchange = (ServerWebExchange)pjp.getArgs()[0];
+        CaptchaDTO dto = Optional.ofNullable((CaptchaDTO)pjp.getArgs()[1]).orElse(new CaptchaDTO());
         validateCaptcha(dto, exchange);
 
         log.info("{}Captcha validation was successful, continue with the endpoint", methodName);
@@ -43,8 +44,7 @@ public class ValidateCaptchaAspect {
         }
         else {
             // Validate captcha response, if is invalid, it throws a BadRequest
-//            captchaValidatorService.validateCaptcha(dto.getCaptchaResponse(), NetworkUtil.getClientIp(exchange));
-            captchaValidatorService.validateCaptcha(dto.getCaptchaResponse(), "");
+            captchaValidatorService.validateCaptcha(dto.getCaptchaResponse(), NetworkUtil.getClientIp(exchange));
         }
 
     }
