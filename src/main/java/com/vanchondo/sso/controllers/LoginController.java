@@ -5,13 +5,11 @@ import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.dtos.security.LoginDTO;
 import com.vanchondo.sso.dtos.security.TokenDTO;
 import com.vanchondo.sso.dtos.security.ValidateUserDTO;
-import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.services.AuthenticationService;
 import com.vanchondo.sso.services.ReactiveUserService;
 import com.vanchondo.sso.services.UserService;
 import com.vanchondo.sso.utilities.RegexConstants;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,7 +26,6 @@ import java.util.Map;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/")
@@ -39,12 +36,12 @@ public class LoginController {
     private final UserService userService;
     private final AuthenticationService authenticationService;
 
-    @ValidateCaptcha
-    @PostMapping(value = "register")
-    public Mono<ResponseEntity<UserDTO>> saveUser(ServerWebExchange exchange, @Valid @RequestBody SaveUserDTO user){
-        return reactiveUserService.saveUser(user)
-          .map(dto -> ResponseEntity.status(HttpStatus.CREATED).body(dto));
-    }
+//    @ValidateCaptcha
+//    @PostMapping(value = "register")
+//    public Mono<ResponseEntity<UserDTO>> saveUser(ServerWebExchange exchange, @Valid @RequestBody SaveUserDTO user){
+//        return reactiveUserService.saveUser(user)
+//          .map(dto -> ResponseEntity.status(HttpStatus.CREATED).body(dto));
+//    }
 
     @PostMapping(value = "validate")
     public ResponseEntity<UserDTO> validateUser(@RequestBody ValidateUserDTO user) {

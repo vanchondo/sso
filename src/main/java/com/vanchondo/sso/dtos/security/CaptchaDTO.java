@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class CaptchaDTO {
-    @NotEmpty
+    @NotEmpty(message = "CaptchaResponse is required")
     private String captchaResponse;
     private boolean test;
 }

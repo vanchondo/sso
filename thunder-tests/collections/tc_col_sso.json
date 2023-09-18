@@ -12,13 +12,6 @@
             "sortNum": 10000
         },
         {
-            "_id": "1ce4d20f-f1a4-4ebf-8201-92abe2255be6",
-            "name": "200",
-            "containerId": "c8d0f12d-b229-4554-8b34-56d456c48c13",
-            "created": "2023-07-15T05:04:06.807Z",
-            "sortNum": 20000
-        },
-        {
             "_id": "d4407ba7-19ef-41ca-ae92-e4e414f338ed",
             "name": "400",
             "containerId": "c8d0f12d-b229-4554-8b34-56d456c48c13",
@@ -41,7 +34,7 @@
         },
         {
             "_id": "41faa1f6-08b7-482e-98ce-0ce7481cf450",
-            "name": "200",
+            "name": "400",
             "containerId": "f0304198-c79d-4961-9227-acbf5a65e153",
             "created": "2023-07-15T05:21:58.506Z",
             "sortNum": 60000
@@ -59,35 +52,16 @@
             "containerId": "8d023cdf-d7f0-4910-9a83-465e3ce2d7eb",
             "created": "2023-07-19T14:01:19.239Z",
             "sortNum": 80000
+        },
+        {
+            "_id": "4c2d4de5-703c-4fcf-929a-c261f45bf7b5",
+            "name": "/users",
+            "containerId": "",
+            "created": "2023-07-20T01:40:02.471Z",
+            "sortNum": 100000
         }
     ],
     "requests": [
-        {
-            "_id": "7a1a2fbd-cf0b-4820-bdbb-7ce42ed13c6d",
-            "colId": "f05919d4-83ba-46cb-8507-5ccb663bde77",
-            "containerId": "1ce4d20f-f1a4-4ebf-8201-92abe2255be6",
-            "name": "Login successful",
-            "url": "{{host}}/login",
-            "method": "POST",
-            "sortNum": 10000,
-            "created": "2023-07-13T17:52:15.440Z",
-            "modified": "2023-07-15T05:07:51.553Z",
-            "headers": [],
-            "params": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n    \"username\" : \"vanchondo\",\n    \"password\" : \"password\",\n    \"captchaResponse\": \"{{RECAPTCHA_SECRET_KEY}}\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "200"
-                }
-            ]
-        },
         {
             "_id": "c11ee7d0-90af-4b41-ac52-8431f7341fb8",
             "colId": "f05919d4-83ba-46cb-8507-5ccb663bde77",
@@ -97,12 +71,12 @@
             "method": "POST",
             "sortNum": 10000,
             "created": "2023-07-15T04:57:55.319Z",
-            "modified": "2023-07-15T05:09:04.730Z",
+            "modified": "2023-07-20T02:45:42.078Z",
             "headers": [],
             "params": [],
             "body": {
                 "type": "json",
-                "raw": "{\n    \"username\" : \"vanchondo\",\n    \"password\" : \"anotherPassword\",\n    \"captchaResponse\": \"{{RECAPTCHA_SECRET_KEY}}\"\n}",
+                "raw": "{\n    \"username\" : \"{{username}}\",\n    \"password\" : \"anotherPassword\",\n    \"captchaResponse\": \"{{RECAPTCHA_SECRET_KEY}}\"\n}",
                 "form": []
             },
             "tests": [
@@ -111,6 +85,12 @@
                     "custom": "",
                     "action": "equal",
                     "value": "401"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.messages",
+                    "action": "count",
+                    "value": "1"
                 }
             ]
         },
@@ -123,12 +103,12 @@
             "method": "POST",
             "sortNum": 20000,
             "created": "2023-07-15T05:01:28.007Z",
-            "modified": "2023-07-15T05:08:30.431Z",
+            "modified": "2023-07-20T02:43:54.378Z",
             "headers": [],
             "params": [],
             "body": {
                 "type": "json",
-                "raw": "{\n    \"username\" : \"a\",\n    \"password\" : \"password\",\n    \"captchaResponse\": \"{{RECAPTCHA_SECRET_KEY}}\"\n}",
+                "raw": "{\n    \"username\" : \"a\",\n    \"password\" : \"{{password}}\",\n    \"captchaResponse\": \"{{RECAPTCHA_SECRET_KEY}}\"\n}",
                 "form": []
             },
             "tests": [
@@ -137,6 +117,12 @@
                     "custom": "",
                     "action": "equal",
                     "value": "400"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.messages",
+                    "action": "count",
+                    "value": "1"
                 }
             ]
         },
@@ -149,12 +135,12 @@
             "method": "POST",
             "sortNum": 10000,
             "created": "2023-07-15T05:04:23.428Z",
-            "modified": "2023-07-15T05:08:11.760Z",
+            "modified": "2023-07-20T02:42:29.910Z",
             "headers": [],
             "params": [],
             "body": {
                 "type": "json",
-                "raw": "{\n    \"username\" : \"vanchondo\",\n    \"password\" : \"password\",\n    \"captchaResponse\": \"asdfas\"\n}",
+                "raw": "{\n    \"username\" : \"{{username}}\",\n    \"password\" : \"{{password}}\",\n    \"captchaResponse\": \"asdfas\"\n}",
                 "form": []
             },
             "tests": [
@@ -163,6 +149,12 @@
                     "custom": "",
                     "action": "equal",
                     "value": "400"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.messages",
+                    "action": "count",
+                    "value": "1"
                 }
             ]
         },
@@ -175,12 +167,12 @@
             "method": "POST",
             "sortNum": 30000,
             "created": "2023-07-15T05:05:25.895Z",
-            "modified": "2023-07-15T05:08:44.511Z",
+            "modified": "2023-07-20T02:44:30.909Z",
             "headers": [],
             "params": [],
             "body": {
                 "type": "json",
-                "raw": "{\n    \"username\" : \"vanchondo\",\n    \"password\" : \"p\",\n    \"captchaResponse\": \"{{RECAPTCHA_SECRET_KEY}}\"\n}",
+                "raw": "{\n    \"username\" : \"{{username}}\",\n    \"password\" : \"p\",\n    \"captchaResponse\": \"{{RECAPTCHA_SECRET_KEY}}\"\n}",
                 "form": []
             },
             "tests": [
@@ -189,69 +181,30 @@
                     "custom": "",
                     "action": "equal",
                     "value": "400"
-                }
-            ]
-        },
-        {
-            "_id": "7253fc76-663b-41f6-a9b7-78a3cf494a8a",
-            "colId": "f05919d4-83ba-46cb-8507-5ccb663bde77",
-            "containerId": "d4407ba7-19ef-41ca-ae92-e4e414f338ed",
-            "name": "Invalid username and password",
-            "url": "{{host}}/login",
-            "method": "POST",
-            "sortNum": 40000,
-            "created": "2023-07-15T05:05:53.646Z",
-            "modified": "2023-07-15T05:08:53.723Z",
-            "headers": [],
-            "params": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n    \"username\" : \"$#@@#$!@$@#\",\n    \"password\" : \"p\",\n    \"captchaResponse\": \"{{RECAPTCHA_SECRET_KEY}}\"\n}",
-                "form": []
-            },
-            "tests": [
+                },
                 {
-                    "type": "res-code",
-                    "custom": "",
-                    "action": "equal",
-                    "value": "400"
+                    "type": "json-query",
+                    "custom": "json.messages",
+                    "action": "count",
+                    "value": "1"
                 }
             ]
-        },
-        {
-            "_id": "cfb02454-786c-4e90-80fc-8ed2736ece92",
-            "colId": "f05919d4-83ba-46cb-8507-5ccb663bde77",
-            "containerId": "41faa1f6-08b7-482e-98ce-0ce7481cf450",
-            "name": "register",
-            "url": "{{host}}/register",
-            "method": "POST",
-            "sortNum": 30000,
-            "created": "2023-07-15T05:22:11.280Z",
-            "modified": "2023-07-19T14:00:36.493Z",
-            "headers": [],
-            "params": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n    \"username\" : \"mySuperUsername7\",\n    \"password\" : \"password\",\n    \"email\" : \"eduardoanchondo+test3@gmail.com\",\n    \"captchaResponse\": \"{{RECAPTCHA_SECRET_KEY}}\"\n}",
-                "form": []
-            },
-            "tests": []
         },
         {
             "_id": "e24bb44b-239c-4722-badc-ad7ab228bdbc",
             "colId": "f05919d4-83ba-46cb-8507-5ccb663bde77",
             "containerId": "e7a54f0b-62ea-4d1f-a23d-103563e55871",
             "name": "validate",
-            "url": "{{host}}/validate?email=eduardoanchondo%2Btest3%40gmail.com&token={{RECAPTCHA_SECRET_KEY}}",
+            "url": "{{host}}/validate?email={{emailEncoded}}&token={{RECAPTCHA_SECRET_KEY}}",
             "method": "POST",
             "sortNum": 60000,
             "created": "2023-07-19T14:01:29.342Z",
-            "modified": "2023-07-19T14:04:37.203Z",
+            "modified": "2023-07-20T02:00:43.286Z",
             "headers": [],
             "params": [
                 {
                     "name": "email",
-                    "value": "eduardoanchondo%2Btest3%40gmail.com",
+                    "value": "{{emailEncoded}}",
                     "isPath": false
                 },
                 {
@@ -261,6 +214,186 @@
                 }
             ],
             "tests": []
+        },
+        {
+            "_id": "2babf8a6-2234-4a00-be81-9211755b4669",
+            "colId": "f05919d4-83ba-46cb-8507-5ccb663bde77",
+            "containerId": "4c2d4de5-703c-4fcf-929a-c261f45bf7b5",
+            "name": "delete flow success",
+            "url": "{{host}}/users/",
+            "method": "DELETE",
+            "sortNum": 70000,
+            "created": "2023-07-20T01:40:23.462Z",
+            "modified": "2023-07-20T02:50:31.382Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"password\" : \"{{password}}\",\n  \"captchaResponse\": \"{{RECAPTCHA_SECRET_KEY}}\"\n}",
+                "form": []
+            },
+            "auth": {
+                "type": "bearer",
+                "bearer": "{{jwt}}"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                }
+            ],
+            "preReq": {
+                "runRequests": [
+                    {
+                        "reqId": "ebdcbc92-6827-4653-9173-bc19846449b3",
+                        "colId": "0a746d87-4180-4bd2-b193-487a7b724a90",
+                        "triggerCondition": "run-always",
+                        "triggerValue": ""
+                    },
+                    {
+                        "reqId": "8da59a81-eb0f-456c-b2d0-ff2d6499ad0e",
+                        "colId": "0a746d87-4180-4bd2-b193-487a7b724a90",
+                        "triggerCondition": "run-always",
+                        "triggerValue": ""
+                    },
+                    {
+                        "reqId": "eced138b-296d-4c7a-b139-447b0238ba34",
+                        "colId": "0a746d87-4180-4bd2-b193-487a7b724a90",
+                        "triggerCondition": "run-always",
+                        "triggerValue": ""
+                    }
+                ]
+            }
+        },
+        {
+            "_id": "c06ccba8-9043-4e30-8222-3032666e9597",
+            "colId": "f05919d4-83ba-46cb-8507-5ccb663bde77",
+            "containerId": "41faa1f6-08b7-482e-98ce-0ce7481cf450",
+            "name": "register - invalid username",
+            "url": "{{host}}/register",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2023-07-20T02:21:37.347Z",
+            "modified": "2023-07-20T02:47:31.861Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"username\" : \"user\",\n    \"password\" : \"{{password}}\",\n    \"email\" : \"{{email}}\",\n    \"captchaResponse\": \"{{RECAPTCHA_SECRET_KEY}}\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "json-query",
+                    "custom": "json.messages",
+                    "action": "count",
+                    "value": "1"
+                },
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "400"
+                }
+            ]
+        },
+        {
+            "_id": "3748253e-6557-48a7-ad89-338b250e448b",
+            "colId": "f05919d4-83ba-46cb-8507-5ccb663bde77",
+            "containerId": "41faa1f6-08b7-482e-98ce-0ce7481cf450",
+            "name": "register - invalid password",
+            "url": "{{host}}/register",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2023-07-20T02:29:03.698Z",
+            "modified": "2023-07-20T02:47:09.337Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"username\" : \"{{username}}\",\n    \"password\" : \"pass\",\n    \"email\" : \"{{email}}\",\n    \"captchaResponse\": \"{{RECAPTCHA_SECRET_KEY}}\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "json-query",
+                    "custom": "json.messages",
+                    "action": "count",
+                    "value": "1"
+                },
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "400"
+                }
+            ]
+        },
+        {
+            "_id": "0c1645f4-7362-475a-90d6-05d4675febd2",
+            "colId": "f05919d4-83ba-46cb-8507-5ccb663bde77",
+            "containerId": "41faa1f6-08b7-482e-98ce-0ce7481cf450",
+            "name": "register - invalid email",
+            "url": "{{host}}/register",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2023-07-20T02:29:55.380Z",
+            "modified": "2023-07-20T02:47:36.845Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"username\" : \"{{username}}\",\n    \"password\" : \"{{password}}\",\n    \"email\" : \"email\",\n    \"captchaResponse\": \"{{RECAPTCHA_SECRET_KEY}}\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "json-query",
+                    "custom": "json.messages",
+                    "action": "count",
+                    "value": "1"
+                },
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "400"
+                }
+            ]
+        },
+        {
+            "_id": "5a194792-3e1f-460a-a7f4-e1f10934d3c8",
+            "colId": "f05919d4-83ba-46cb-8507-5ccb663bde77",
+            "containerId": "41faa1f6-08b7-482e-98ce-0ce7481cf450",
+            "name": "register - invalid captcha",
+            "url": "{{host}}/register",
+            "method": "POST",
+            "sortNum": 40000,
+            "created": "2023-07-20T02:41:01.075Z",
+            "modified": "2023-07-20T02:47:40.826Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"username\" : \"{{username}}\",\n    \"password\" : \"{{password}}\",\n    \"email\" : \"{{email}}\",\n    \"captchaResponse\": \"captcha\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "json-query",
+                    "custom": "json.messages",
+                    "action": "count",
+                    "value": "1"
+                },
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "400"
+                }
+            ]
         }
     ]
 }
