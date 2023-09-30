@@ -51,6 +51,7 @@ dependencies {
 
     // Test libraries
     testImplementation "org.springframework.boot:spring-boot-starter-test:${springBoot_version}"
+    testImplementation "io.projectreactor:reactor-test:${springBoot_version}"
     testCompileOnly "org.projectlombok:lombok:${lombok_version}"
     testAnnotationProcessor "org.projectlombok:lombok:${lombok_version}"
 

@@ -24,7 +24,8 @@ public class LoginHandler {
 //  @ValidateCaptcha
   public Mono<ServerResponse> handleRegister(ServerRequest request) {
     return request.bodyToMono(SaveUserDTO.class)
-      .flatMap(user -> validate.validate(user))
+      .defaultIfEmpty(new SaveUserDTO())
+      .flatMap(validate::validate)
       .map(user -> (SaveUserDTO)user)
       .flatMap(user -> {
 //        if (errors.hasErrors()) {
