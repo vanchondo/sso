@@ -11,7 +11,7 @@ import com.vanchondo.sso.configs.properties.LoginConfiguration;
 import com.vanchondo.sso.dtos.ErrorDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
-import com.vanchondo.sso.routes.LoginRoutes;
+import com.vanchondo.sso.routers.LoginRouter;
 import com.vanchondo.sso.services.ReactiveUserService;
 import com.vanchondo.sso.utilities.ObjectFactory;
 import com.vanchondo.sso.utilities.Validate;
@@ -48,7 +48,7 @@ public class LoginHandlerTest {
 
   @BeforeEach
   public void setup() {
-    RouterFunction<?> routes = new LoginRoutes().loginRoutes(loginHandler);
+    RouterFunction<?> routes = new LoginRouter().loginRoutes(loginHandler);
     webTestClient = WebTestClient.bindToRouterFunction(routes).build();
 
     when(userService.saveUser(any(SaveUserDTO.class))).thenReturn(Mono.just(new UserDTO()));

@@ -1,5 +1,6 @@
 package com.vanchondo.sso.handlers;
 
+import com.vanchondo.sso.aspect.ValidateCaptcha;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.exceptions.GlobalErrorWebExceptionHandler;
 import com.vanchondo.sso.services.ReactiveUserService;
@@ -21,7 +22,7 @@ public class LoginHandler {
   private final ReactiveUserService reactiveUserService;
   private final Validate validate;
 
-//  @ValidateCaptcha
+  @ValidateCaptcha
   public Mono<ServerResponse> handleRegister(ServerRequest request) {
     return request.bodyToMono(SaveUserDTO.class)
       .defaultIfEmpty(new SaveUserDTO())

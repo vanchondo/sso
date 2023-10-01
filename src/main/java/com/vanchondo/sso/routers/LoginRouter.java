@@ -1,4 +1,4 @@
-package com.vanchondo.sso.routes;
+package com.vanchondo.sso.routers;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
@@ -10,7 +10,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
 @Configuration
-public class LoginRoutes {
+public class LoginRouter {
 
   @Bean
   public RouterFunction<ServerResponse> loginRoutes(LoginHandler loginHandler) {
