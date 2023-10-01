@@ -28,13 +28,8 @@ public class LoginHandler {
       .flatMap(validate::validate)
       .map(user -> (SaveUserDTO)user)
       .flatMap(user -> {
-//        if (errors.hasErrors()) {
-//          return ServerResponse.badRequest().syncBody(errors.getAllErrors());
-//          return Mono.error(new MethodArgumentNotValidException(null, errors));
-//        } else {
           return reactiveUserService.saveUser(user)
             .flatMap(dto -> ServerResponse.status(HttpStatus.CREATED).bodyValue(dto));
-//        }
       })
       .onErrorResume(ConstraintViolationException.class, error ->
         GlobalErrorWebExceptionHandler.handle(error, request.exchange())

@@ -22,8 +22,7 @@ public class Validate {
     Set<ConstraintViolation<Object>> violations = validator.validate(dto);
     if (!violations.isEmpty()){
       log.info("{}Object is invalid", logPrefix);
-//      return Mono.error(new ConstraintViolationException(violations));
-      throw new ConstraintViolationException(violations);
+      return Mono.error(new ConstraintViolationException(violations));
     }
 
     log.info("{}Object is valid", logPrefix);
