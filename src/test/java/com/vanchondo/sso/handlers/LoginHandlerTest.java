@@ -12,6 +12,7 @@ import com.vanchondo.sso.dtos.ErrorDTO;
 import com.vanchondo.sso.dtos.security.CaptchaDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
+import com.vanchondo.sso.exceptions.GlobalErrorWebExceptionHandler;
 import com.vanchondo.sso.routers.LoginRouter;
 import com.vanchondo.sso.services.CaptchaValidatorService;
 import com.vanchondo.sso.services.ReactiveUserService;
@@ -21,6 +22,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.reactive.ReactiveUserDetailsServiceAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
@@ -35,11 +38,15 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @ExtendWith({SpringExtension.class})
-@WebFluxTest
+@WebFluxTest(excludeAutoConfiguration = {
+  ReactiveSecurityAutoConfiguration.class,
+  ReactiveUserDetailsServiceAutoConfiguration.class
+})
 @ContextConfiguration(classes = {
   LoginConfiguration.class,
   LoginHandler.class,
-  Validate.class
+  Validate.class,
+  GlobalErrorWebExceptionHandler.class
 })
 public class LoginHandlerTest {
   private WebTestClient webTestClient;
