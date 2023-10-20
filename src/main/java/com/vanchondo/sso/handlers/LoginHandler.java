@@ -29,9 +29,9 @@ public class LoginHandler {
             .flatMap(result -> validate.validate(dto))
       )
       .map(user -> (SaveUserDTO)user)
-      .flatMap(user -> {
-          return reactiveUserService.saveUser(user)
-            .flatMap(dto -> ServerResponse.status(HttpStatus.CREATED).bodyValue(dto));
-      });
+      .flatMap(user ->
+        reactiveUserService.saveUser(user)
+          .flatMap(dto -> ServerResponse.status(HttpStatus.CREATED).bodyValue(dto))
+      );
   }
 }

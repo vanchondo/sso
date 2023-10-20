@@ -32,7 +32,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.server.ServerWebExchange;
 
 import reactor.core.publisher.Mono;
@@ -43,15 +42,15 @@ import reactor.core.publisher.Mono;
   ReactiveUserDetailsServiceAutoConfiguration.class
 })
 @ContextConfiguration(classes = {
+  LoginRouter.class,
   LoginConfiguration.class,
   LoginHandler.class,
   Validate.class,
   GlobalErrorWebExceptionHandler.class
 })
 public class LoginHandlerTest {
-  private WebTestClient webTestClient;
   @Autowired
-  private LoginHandler loginHandler;
+  private WebTestClient webTestClient;
 
   @MockBean
   private CaptchaValidatorService captchaValidatorService;
@@ -60,14 +59,11 @@ public class LoginHandlerTest {
 
   @BeforeEach
   public void setup() {
-    RouterFunction<?> routes = new LoginRouter().loginRoutes(loginHandler);
-    webTestClient = WebTestClient.bindToRouterFunction(routes).build();
-
     when(userService.saveUser(any(SaveUserDTO.class))).thenReturn(Mono.just(new UserDTO()));
     when(captchaValidatorService.validateCaptcha(any(CaptchaDTO.class), any(ServerWebExchange.class))).thenReturn(Mono.just(true));
   }
 
-//  @Test
+  @Test
   public void testRegisterWhenRequiredParametersAreNotIncluded() {
     SaveUserDTO invalidDto = ObjectFactory.createSaveUserDTOWithInvalidProperties();
     webTestClient.post()
