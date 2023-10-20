@@ -11,6 +11,7 @@ import com.vanchondo.sso.configs.properties.LoginConfiguration;
 import com.vanchondo.sso.dtos.ErrorDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
+import com.vanchondo.sso.exceptions.GlobalErrorWebExceptionHandler;
 import com.vanchondo.sso.routes.LoginRoutes;
 import com.vanchondo.sso.services.ReactiveUserService;
 import com.vanchondo.sso.utilities.ObjectFactory;
@@ -27,30 +28,27 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.reactive.function.server.RouterFunction;
 
 import reactor.core.publisher.Mono;
 
 @ExtendWith({SpringExtension.class})
 @WebFluxTest
 @ContextConfiguration(classes = {
+  LoginRoutes.class,
   LoginConfiguration.class,
   LoginHandler.class,
-  Validate.class
+  Validate.class,
+  GlobalErrorWebExceptionHandler.class
 })
 public class LoginHandlerTest {
-  private WebTestClient webTestClient;
   @Autowired
-  private LoginHandler loginHandler;
+  private WebTestClient webTestClient;
 
   @MockBean
   private ReactiveUserService userService;
 
   @BeforeEach
   public void setup() {
-    RouterFunction<?> routes = new LoginRoutes().loginRoutes(loginHandler);
-    webTestClient = WebTestClient.bindToRouterFunction(routes).build();
-
     when(userService.saveUser(any(SaveUserDTO.class))).thenReturn(Mono.just(new UserDTO()));
   }
 

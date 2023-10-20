@@ -13,7 +13,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 public class LoginRoutes {
 
   @Bean
-  public RouterFunction<ServerResponse> loginRoutes(LoginHandler loginHandler) {
+  public RouterFunction<ServerResponse> loginRoute(LoginHandler loginHandler) {
     return route(POST("/register"), loginHandler::handleRegister);
   }
 }

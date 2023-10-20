@@ -1,7 +1,6 @@
 package com.vanchondo.sso.handlers;
 
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
-import com.vanchondo.sso.exceptions.GlobalErrorWebExceptionHandler;
 import com.vanchondo.sso.services.ReactiveUserService;
 import com.vanchondo.sso.utilities.Validate;
 import org.springframework.http.HttpStatus;
@@ -9,7 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
-import jakarta.validation.ConstraintViolationException;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Mono;
@@ -30,9 +28,6 @@ public class LoginHandler {
       .flatMap(user -> {
           return reactiveUserService.saveUser(user)
             .flatMap(dto -> ServerResponse.status(HttpStatus.CREATED).bodyValue(dto));
-      })
-      .onErrorResume(ConstraintViolationException.class, error ->
-        GlobalErrorWebExceptionHandler.handle(error, request.exchange())
-      );
+      });
   }
 }
