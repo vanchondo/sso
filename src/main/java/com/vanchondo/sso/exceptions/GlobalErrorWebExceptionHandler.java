@@ -31,7 +31,7 @@ import reactor.core.publisher.Mono;
 @Order(-2)
 public class GlobalErrorWebExceptionHandler extends AbstractErrorWebExceptionHandler {
 
-  private static final String logMessage = "::handle:: Handle exception response for ex={}";
+  private static final String logMessage = "::handle:: Handle exception response for errorMessage={}";
 
   public GlobalErrorWebExceptionHandler(ErrorAttributes errorAttributes,
     ApplicationContext applicationContext,
@@ -59,6 +59,9 @@ public class GlobalErrorWebExceptionHandler extends AbstractErrorWebExceptionHan
     if (error instanceof ConstraintViolationException) {
       return handle((ConstraintViolationException)error, exchange);
     }
+    else if (error instanceof ReCaptchaInvalidException) {
+      return handle((ReCaptchaInvalidException)error, exchange);
+    }
     else {
       return handle((Exception)error, exchange);
     }
@@ -73,9 +76,15 @@ public class GlobalErrorWebExceptionHandler extends AbstractErrorWebExceptionHan
       )
       .orElse(Collections.emptyList());
 
-    log.warn("::handle:: error={}", messages, ex);
+    log.warn(logMessage, messages, ex);
 
     return buildResponse(HttpStatus.BAD_REQUEST, messages, exchange);
+  }
+
+  public static Mono<ServerResponse> handle(ReCaptchaInvalidException ex, ServerWebExchange exchange) {
+    log.warn(logMessage, ex.getMessage(), ex);
+
+    return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), exchange);
   }
 
   public static Mono<ServerResponse> handle(Exception ex, ServerWebExchange exchange) {
