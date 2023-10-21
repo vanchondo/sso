@@ -9,7 +9,6 @@ import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.services.AuthenticationService;
 import com.vanchondo.sso.services.ReactiveUserService;
 import com.vanchondo.sso.services.UserService;
-import com.vanchondo.sso.utilities.RegexConstants;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,8 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 
 import javax.security.sasl.AuthenticationException;
-import java.util.HashMap;
-import java.util.Map;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -61,15 +58,5 @@ public class LoginController {
     public CurrentUserDTO getCurrentUser(@RequestAttribute("currentUser") CurrentUserDTO currentUser){
         log.info("::getCurrentUser::Entering getCurrentUser endpoint for username={}", currentUser.getUsername());
         return currentUser;
-    }
-
-    @GetMapping("regex")
-    public Map<String, String> getRegex(){
-        log.info("::getRegex::Entering getRegex endpoint");
-        Map<String, String> regexMap = new HashMap<>();
-        regexMap.put("USERNAME_REGEX", RegexConstants.USERNAME_REGEX);
-        regexMap.put("PASSWORD_REGEX", RegexConstants.PASSWORD_REGEX);
-        regexMap.put("EMAIL_REGEX", RegexConstants.EMAIL_REGEX);
-        return regexMap;
     }
 }

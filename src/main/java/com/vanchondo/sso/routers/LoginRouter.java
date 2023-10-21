@@ -1,5 +1,6 @@
 package com.vanchondo.sso.routers;
 
+import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
@@ -14,6 +15,7 @@ public class LoginRouter {
 
   @Bean
   public RouterFunction<ServerResponse> loginRoute(LoginHandler loginHandler) {
-    return route(POST("/register"), loginHandler::handleRegister);
+    return route(POST("/register"), loginHandler::handleRegister)
+      .andRoute(GET("/regex"), loginHandler::handleRegex);
   }
 }
