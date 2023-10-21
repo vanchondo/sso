@@ -1,5 +1,6 @@
 package com.vanchondo.sso.handlers;
 
+import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.services.CaptchaValidatorService;
 import com.vanchondo.sso.services.ReactiveUserService;
@@ -48,5 +49,13 @@ public class LoginHandler {
     regexMap.put("EMAIL_REGEX", RegexConstants.EMAIL_REGEX);
 
     return ServerResponse.ok().bodyValue(regexMap);
+  }
+
+  public Mono<ServerResponse> handleCurrentUser(ServerRequest request) {
+    log.info("::handleCurrentUser::Entering method");
+    return request.attribute("currentUser")
+      .map(currentUser -> (CurrentUserDTO)currentUser)
+      .map(currentUser -> ServerResponse.ok().bodyValue(currentUser))
+      .orElse(ServerResponse.status(HttpStatus.UNAUTHORIZED).build());
   }
 }
