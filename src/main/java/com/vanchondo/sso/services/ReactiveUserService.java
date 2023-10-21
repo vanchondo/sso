@@ -49,18 +49,18 @@ public class ReactiveUserService {
 
                   return userRepository.save(entity)
                     .flatMap(stored -> {
-                        if (!dto.isTest()) {
-                            // Send an email to the user and handle exceptions gracefully
-                            return Mono.fromCallable(() -> emailService.sendEmailReactive(entity.getEmail(), entity.getVerificationToken()))
-                              .thenReturn(stored)
-                              .onErrorResume(ex -> {
-                                  userRepository.delete(entity);
-                                  log.error("::saveUser:: Error sending email to={}", entity.getEmail(), ex);
-                                  return Mono.error(new ConflictException("Error sending email to=" + entity.getEmail()));
-                              });
-                        } else {
-                            return Mono.just(stored);
-                        }
+                      if (!dto.isTest()) {
+                        // Send an email to the user and handle exceptions gracefully
+                        return emailService.sendEmailReactive(entity.getEmail(), entity.getVerificationToken())
+                          .thenReturn(stored)
+                          .onErrorResume(ex -> {
+                            log.error("::saveUser:: Error sending email to={}", entity.getEmail(), ex);
+                            return userRepository.delete(entity)
+                                .then(Mono.error(new ConflictException("Error sending email to=" + entity.getEmail())));
+                          });
+                      } else {
+                          return Mono.just(stored);
+                      }
                     })
                     .map(UserDTOMapper::map);
               } else {
