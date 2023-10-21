@@ -17,7 +17,6 @@ import freemarker.template.TemplateExceptionHandler;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
 import jakarta.mail.Message.RecipientType;
-import jakarta.mail.MessagingException;
 import jakarta.mail.Multipart;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
@@ -73,30 +72,6 @@ public class EmailService {
             log.info("{}Email sent successfully to={}", methodName, toEmail);
             return null;
         }).subscribeOn(Schedulers.boundedElastic()).then(); // Use a separate thread pool for blocking operations
-    }
-
-
-    public void sendEmail(String toEmail, String token) throws MessagingException, TemplateException, IOException {
-        String methodName = "::sendEmail::";
-        log.info("{}Sending validation email to={}", methodName, toEmail);
-        Message message = new MimeMessage(session);
-        message.setFrom(new InternetAddress(emailConfiguration.getFrom(), "NoReply"));
-        message.setReplyTo(InternetAddress.parse(emailConfiguration.getFrom(), false));
-        message.setRecipients(
-                Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
-        message.setSubject("Verificar cuenta");
-        String link = String.format("https://login.victoranchondo.com/validate?email=%s&token=%s", EmailUtil.encode(toEmail), EmailUtil.encode(token));
-
-        String msg = getEmailBody(link);
-        MimeBodyPart mimeBodyPart = new MimeBodyPart();
-        mimeBodyPart.setContent(msg, "text/html; charset=utf-8");
-
-        Multipart multipart = new MimeMultipart();
-        multipart.addBodyPart(mimeBodyPart);
-        message.setContent(multipart);
-
-        Transport.send(message);
-        log.info("{}Email sent successfully to={}", methodName, toEmail);
     }
 
     private String getEmailBody(String link) throws IOException, TemplateException {

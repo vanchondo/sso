@@ -17,6 +17,7 @@ public class LoginRouter {
   public RouterFunction<ServerResponse> loginRoute(LoginHandler loginHandler) {
     return route(POST("/register"), loginHandler::handleRegister)
       .andRoute(GET("/regex"), loginHandler::handleRegex)
-      .andRoute(GET("/currentUser"), loginHandler::handleCurrentUser);
+      .andRoute(GET("/currentUser"), loginHandler::handleCurrentUser)
+      .andRoute(POST("/validate"), loginHandler::handleValidateUser);
   }
 }

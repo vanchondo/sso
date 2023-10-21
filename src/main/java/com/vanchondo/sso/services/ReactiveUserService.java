@@ -1,12 +1,16 @@
 package com.vanchondo.sso.services;
 
+import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.entities.UserEntity;
+import com.vanchondo.sso.exceptions.BadRequestException;
 import com.vanchondo.sso.exceptions.ConflictException;
+import com.vanchondo.sso.exceptions.NotFoundException;
 import com.vanchondo.sso.mappers.UserDTOMapper;
 import com.vanchondo.sso.mappers.UserEntityMapper;
 import com.vanchondo.sso.repositories.ReactiveUserRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -68,6 +72,38 @@ public class ReactiveUserService {
                   return Mono.error(new ConflictException("Email or username already registered"));
               }
           });
+    }
+
+    public Mono<Boolean> validateUser(ValidateUserDTO userDTO) {
+      String email = userDTO.getEmail();
+      String token = userDTO.getToken();
+      String methodName="::validateUser::";
+      log.info("{}Trying to validate email={} token={}", methodName, email, token);
+      if (StringUtils.isEmpty(token) || StringUtils.isEmpty(email)) {
+        log.error("{}Email and/or token are null", methodName);
+        return Mono.error(new NotFoundException("User validation not found"));
+      }
+      return userRepository.findByEmail(email)
+
+        .flatMap(entity -> {
+          if (entity == null) {
+            log.error("{}User registry not found", methodName);
+            return Mono.error(new NotFoundException("User validation not found"));
+          }
+          if (token.equals(entity.getVerificationToken())) {
+            log.info("{}Activating user", methodName);
+            entity.setActive(true);
+            entity.setLastUpdatedAt(LocalDateTime.now());
+            entity.setVerificationToken(null);
+            return userRepository.save(entity)
+              .map(savedUser -> true);
+          }
+          else {
+            log.error("{}Token not valid", methodName);
+            return Mono.error(new BadRequestException("Token not valid"));
+          }
+        });
+
     }
 
 }

@@ -1,6 +1,7 @@
 package com.vanchondo.sso.handlers;
 
 import com.vanchondo.sso.dtos.security.CurrentUserDTO;
+import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.services.CaptchaValidatorService;
 import com.vanchondo.sso.services.ReactiveUserService;
@@ -57,5 +58,15 @@ public class LoginHandler {
       .map(currentUser -> (CurrentUserDTO)currentUser)
       .map(currentUser -> ServerResponse.ok().bodyValue(currentUser))
       .orElse(ServerResponse.status(HttpStatus.UNAUTHORIZED).build());
+  }
+
+  public Mono<ServerResponse> handleValidateUser(ServerRequest request) {
+    log.info("::handleValidateUser::Entering method");
+    return request.bodyToMono(ValidateUserDTO.class)
+      .defaultIfEmpty(new ValidateUserDTO())
+      .flatMap(validate::validate)
+      .map(validateUser -> (ValidateUserDTO)validateUser)
+      .flatMap(reactiveUserService::validateUser)
+      .flatMap(result -> ServerResponse.ok().build());
   }
 }

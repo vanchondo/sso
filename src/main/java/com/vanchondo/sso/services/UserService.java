@@ -1,27 +1,20 @@
 package com.vanchondo.sso.services;
 
 import com.vanchondo.sso.dtos.security.CurrentUserDTO;
-import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.DeleteUserDTO;
-import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UpdateUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.entities.UserEntity;
 import com.vanchondo.sso.exceptions.ConflictException;
 import com.vanchondo.sso.exceptions.NotFoundException;
 import com.vanchondo.sso.mappers.UserDTOMapper;
-import com.vanchondo.sso.mappers.UserEntityMapper;
 import com.vanchondo.sso.repositories.UserRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
-import freemarker.template.TemplateException;
-import jakarta.mail.MessagingException;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -29,62 +22,8 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @AllArgsConstructor
 public class UserService {
-    private EmailService emailService;
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
-
-    public UserDTO saveUser(SaveUserDTO dto){
-        if (userRepository.findByEmail(dto.getEmail()) == null && userRepository.findByUsername(dto.getUsername()) == null) {
-            UserEntity entity = UserEntityMapper.map(dto);
-            entity.setActive(false);
-            entity.setLastUpdatedAt(LocalDateTime.now());
-            entity.setPassword(passwordEncoder.encode(entity.getPassword()));
-            entity.setVerificationToken( dto.isTest()
-                    ? dto.getCaptchaResponse() // Sets captcha response as token
-                    : UUID.randomUUID().toString() // Generates a random uuid
-            );
-            try {
-                entity = userRepository.save(entity);
-                if (!dto.isTest()) {
-                    emailService.sendEmail(entity.getEmail(), entity.getVerificationToken());
-                }
-            } catch (MessagingException | TemplateException | IOException e) {
-                userRepository.delete(entity);
-                log.error("::saveUser:: Error sending email to={}", entity.getEmail(), e);
-                throw new ConflictException("Error sending email to=" + entity.getEmail());
-            }
-            return UserDTOMapper.map(entity);
-        }
-        else {
-            throw new ConflictException("Email or username already registered");
-        }
-    }
-
-    public void validateUser(ValidateUserDTO userDTO) {
-        String email = userDTO.getEmail();
-        String token = userDTO.getToken();
-        String methodName="::validateUser::";
-        log.info("{}Trying to validate email={} token={}", methodName, email, token);
-        if (StringUtils.isEmpty(token) || StringUtils.isEmpty(email)) {
-            log.error("{}Email and/or token are null", methodName);
-            throw new NotFoundException("User validation not found");
-        }
-        UserEntity entity = userRepository.findByEmail(email);
-        if (entity == null) {
-            log.error("{}User registry not found", methodName);
-            throw new NotFoundException("User validation not found");
-        }
-        if (token.equals(entity.getVerificationToken())) {
-            log.info("{}Activating user", methodName);
-            entity.setActive(true);
-            entity.setLastUpdatedAt(LocalDateTime.now());
-            entity.setVerificationToken(null);
-            userRepository.save(entity);
-        }
-        else {
-            log.error("{}Token not valid", methodName);
-        }
-    }
 
     public UserDTO updateUser(UpdateUserDTO dto, CurrentUserDTO currentUser){
         UserEntity entity = userRepository.findByUsername(currentUser.getUsername());
