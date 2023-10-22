@@ -18,6 +18,7 @@ import com.vanchondo.sso.services.AuthenticationService;
 import com.vanchondo.sso.services.CaptchaValidatorService;
 import com.vanchondo.sso.services.UserService;
 import com.vanchondo.sso.utilities.ObjectFactory;
+import com.vanchondo.sso.utilities.RegexConstants;
 import com.vanchondo.sso.utilities.Validate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +36,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ServerWebExchange;
+
+import java.util.Map;
 
 import reactor.core.publisher.Mono;
 
@@ -138,16 +141,17 @@ public class LoginHandlerTest {
 
   @Test
   public void testRegex() {
-//    String responseString = mockMvc.perform(get("/regex"))
-//        .andExpect(status().isOk())
-//        .andReturn().getResponse().getContentAsString();
-//
-//    assertFalse(StringUtils.isEmpty(responseString));
-//    Map<String, String> response = Mapper.readValue(responseString, new TypeReference<>(){});
-//    assertNotNull(response);
-//    assertEquals(3, response.size());
-//    assertEquals(RegexConstants.USERNAME_REGEX, response.get("USERNAME_REGEX"));
-//    assertEquals(RegexConstants.PASSWORD_REGEX, response.get("PASSWORD_REGEX"));
-//    assertEquals(RegexConstants.EMAIL_REGEX, response.get("EMAIL_REGEX"));
+    webTestClient.get()
+      .uri("/regex")
+      .exchange()
+      .expectStatus().isOk()
+      .expectBody(Map.class)
+      .value(response -> {
+        assertNotNull(response);
+        assertEquals(3, response.size());
+        assertEquals(RegexConstants.USERNAME_REGEX, response.get("USERNAME_REGEX"));
+        assertEquals(RegexConstants.PASSWORD_REGEX, response.get("PASSWORD_REGEX"));
+        assertEquals(RegexConstants.EMAIL_REGEX, response.get("EMAIL_REGEX"));
+      });
   }
 }
