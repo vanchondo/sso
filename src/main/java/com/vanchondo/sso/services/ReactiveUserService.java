@@ -1,6 +1,8 @@
 package com.vanchondo.sso.services;
 
+import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.dtos.security.ValidateUserDTO;
+import com.vanchondo.sso.dtos.users.DeleteUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.entities.UserEntity;
@@ -119,6 +121,31 @@ public class ReactiveUserService {
         }
 
         return Mono.just(entity);
+      });
+  }
+
+  public Mono<Boolean> deleteUser(DeleteUserDTO dto, CurrentUserDTO currentUser){
+    String methodName = "::deleteUser::";
+    return userRepository.findByUsername(currentUser.getUsername())
+      .defaultIfEmpty(new UserEntity())
+      .flatMap(entity -> {
+        if (entity == null || StringUtils.isEmpty(entity.getUsername())) {
+          log.warn("{}User not found for deletion. user={}", methodName, currentUser.getUsername());
+          return Mono.error(new NotFoundException("User not found"));
+        }
+        else {
+          if (passwordEncoder.matches(dto.getPassword(), entity.getPassword())){
+            return userRepository.delete(entity)
+              .then(Mono.defer(() -> {
+                log.info("{}User deleted successfully. user={}", methodName, currentUser.getUsername());
+                return Mono.just(true);
+              }));
+          }
+          else {
+            log.warn("{}User cannot be deleted, password is not valid. user={}", methodName, currentUser.getUsername());
+            return Mono.error(new ConflictException("Password is not valid"));
+          }
+        }
       });
   }
 

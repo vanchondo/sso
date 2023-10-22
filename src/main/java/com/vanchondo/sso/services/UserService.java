@@ -1,7 +1,6 @@
 package com.vanchondo.sso.services;
 
 import com.vanchondo.sso.dtos.security.CurrentUserDTO;
-import com.vanchondo.sso.dtos.users.DeleteUserDTO;
 import com.vanchondo.sso.dtos.users.UpdateUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.entities.UserEntity;
@@ -39,26 +38,6 @@ public class UserService {
                 return UserDTOMapper.map(entity);
             }
             else {
-                throw new ConflictException("Password is not valid");
-            }
-        }
-    }
-
-    public boolean deleteUser(DeleteUserDTO dto, CurrentUserDTO currentUser){
-        String methodName = "::deleteUser::";
-        UserEntity entity = userRepository.findByUsername(currentUser.getUsername());
-        if (entity == null) {
-            log.warn("{}User not found for deletion. user={}", methodName, currentUser.getUsername());
-            throw new NotFoundException("User not found");
-        }
-        else {
-            if (passwordEncoder.matches(dto.getPassword(), entity.getPassword())){
-                userRepository.delete(entity);
-                log.info("{}User deleted successfully. user={}", methodName, currentUser.getUsername());
-                return true;
-            }
-            else {
-                log.warn("{}User cannot be deleted, password is not valid. user={}", methodName, currentUser.getUsername());
                 throw new ConflictException("Password is not valid");
             }
         }

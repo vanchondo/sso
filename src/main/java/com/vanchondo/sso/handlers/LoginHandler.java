@@ -3,10 +3,12 @@ package com.vanchondo.sso.handlers;
 import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.dtos.security.LoginDTO;
 import com.vanchondo.sso.dtos.security.ValidateUserDTO;
+import com.vanchondo.sso.dtos.users.DeleteUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.services.AuthenticationService;
 import com.vanchondo.sso.services.CaptchaValidatorService;
 import com.vanchondo.sso.services.ReactiveUserService;
+import com.vanchondo.sso.utilities.Constants;
 import com.vanchondo.sso.utilities.RegexConstants;
 import com.vanchondo.sso.utilities.Validate;
 import org.springframework.http.HttpStatus;
@@ -57,7 +59,7 @@ public class LoginHandler {
 
   public Mono<ServerResponse> handleCurrentUser(ServerRequest request) {
     log.info("::handleCurrentUser::Entering method");
-    return request.attribute("currentUser")
+    return request.attribute(Constants.CURRENT_USER_ATTRIBUTE)
       .map(currentUser -> (CurrentUserDTO)currentUser)
       .map(currentUser -> ServerResponse.ok().bodyValue(currentUser))
       .orElse(ServerResponse.status(HttpStatus.UNAUTHORIZED).build());
@@ -75,11 +77,35 @@ public class LoginHandler {
 
   public Mono<ServerResponse> handleLogin(ServerRequest request) {
     log.info("::handleLogin::Entering method");
-    return  request.bodyToMono(LoginDTO.class)
+    return request.bodyToMono(LoginDTO.class)
       .defaultIfEmpty(new LoginDTO())
       .flatMap(validate::validate)
       .map(login -> (LoginDTO)login)
       .flatMap(authenticationService::login)
       .flatMap(result -> ServerResponse.ok().bodyValue(result));
+  }
+
+  public Mono<ServerResponse> handleDeleteUser(ServerRequest request) {
+    log.info("::handleDeleteUser::Entering method");
+    return request.bodyToMono(DeleteUserDTO.class)
+      .defaultIfEmpty(new DeleteUserDTO())
+      .flatMap(dto ->
+        captchaValidatorService.validateCaptcha(dto, request.exchange())
+          .flatMap(result -> validate.validate(dto))
+      )
+      .map(currentUser -> (DeleteUserDTO)currentUser)
+      .flatMap(user -> {
+        CurrentUserDTO currentUser = (CurrentUserDTO) request.attribute(Constants.CURRENT_USER_ATTRIBUTE)
+          .orElse(null);
+        if (currentUser == null) {
+          return ServerResponse.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return reactiveUserService.deleteUser(user, currentUser)
+          .flatMap(result ->
+            result
+              ? ServerResponse.ok().build()
+              : ServerResponse.badRequest().build()
+          );
+      });
   }
 }

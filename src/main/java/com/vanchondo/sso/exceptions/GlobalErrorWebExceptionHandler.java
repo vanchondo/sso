@@ -63,10 +63,16 @@ public class GlobalErrorWebExceptionHandler extends AbstractErrorWebExceptionHan
       return handle((ReCaptchaInvalidException)error, exchange);
     }
     else if (error instanceof BadRequestException) {
-      return handle((BadRequestException) error, exchange);
+      return handle((BadRequestException)error, exchange);
     }
     else if (error instanceof AuthenticationException) {
-      return handle((AuthenticationException) error, exchange);
+      return handle((AuthenticationException)error, exchange);
+    }
+    else if (error instanceof NotFoundException) {
+      return handle((NotFoundException)error, exchange);
+    }
+    else if (error instanceof ConflictException) {
+      return handle((ConflictException)error, exchange);
     }
     else {
       return handle((Exception)error, exchange);
@@ -103,6 +109,18 @@ public class GlobalErrorWebExceptionHandler extends AbstractErrorWebExceptionHan
     log.warn(logMessage, ex.getMessage(), ex);
 
     return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage(), exchange);
+  }
+
+  public static Mono<ServerResponse> handle(NotFoundException ex, ServerWebExchange exchange) {
+    log.warn(logMessage, ex.getMessage(), ex);
+
+    return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), exchange);
+  }
+
+  public static Mono<ServerResponse> handle(ConflictException ex, ServerWebExchange exchange) {
+    log.warn(logMessage, ex.getMessage(), ex);
+
+    return buildResponse(HttpStatus.CONFLICT, ex.getMessage(), exchange);
   }
 
   public static Mono<ServerResponse> handle(Exception ex, ServerWebExchange exchange) {

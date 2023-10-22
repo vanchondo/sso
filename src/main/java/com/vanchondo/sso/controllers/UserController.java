@@ -1,14 +1,11 @@
 package com.vanchondo.sso.controllers;
 
-import com.vanchondo.sso.aspect.ValidateCaptcha;
 import com.vanchondo.sso.dtos.security.CurrentUserDTO;
-import com.vanchondo.sso.dtos.users.DeleteUserDTO;
 import com.vanchondo.sso.dtos.users.UpdateUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -16,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -34,15 +30,6 @@ public class UserController {
     public ResponseEntity<UserDTO> updateUser(@Valid @RequestBody UpdateUserDTO user, @RequestAttribute("currentUser") CurrentUserDTO currentUser){
         UserDTO dto = userService.updateUser(user, currentUser);
         return ResponseEntity.status(HttpStatus.OK).body(dto);
-    }
-
-    @ValidateCaptcha
-    @DeleteMapping(value = "")
-    public ResponseEntity<Void> deleteUser(ServerWebExchange exchange, @Valid @RequestBody DeleteUserDTO user, @RequestAttribute("currentUser") CurrentUserDTO currentUser) {
-        log.info("::deleteUser::Entering deleteUser endpoint. user={}", currentUser.getUsername());
-        return userService.deleteUser(user, currentUser)
-            ? ResponseEntity.status(HttpStatus.OK).build()
-            : ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     @GetMapping(value="/available")

@@ -1,5 +1,6 @@
 package com.vanchondo.sso.routers;
 
+import static org.springframework.web.reactive.function.server.RequestPredicates.DELETE;
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
@@ -19,6 +20,7 @@ public class LoginRouter {
       .andRoute(GET("/regex"), req -> loginHandler.handleRegex())
       .andRoute(GET("/currentUser"), loginHandler::handleCurrentUser)
       .andRoute(POST("/validate"), loginHandler::handleValidateUser)
-      .andRoute(POST("/login"), loginHandler::handleLogin);
+      .andRoute(POST("/login"), loginHandler::handleLogin)
+      .andRoute(DELETE("/user"), loginHandler::handleDeleteUser);
   }
 }
