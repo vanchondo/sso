@@ -16,9 +16,10 @@ import com.vanchondo.sso.exceptions.GlobalErrorWebExceptionHandler;
 import com.vanchondo.sso.routers.LoginRouter;
 import com.vanchondo.sso.services.AuthenticationService;
 import com.vanchondo.sso.services.CaptchaValidatorService;
-import com.vanchondo.sso.services.ReactiveUserService;
+import com.vanchondo.sso.services.UserService;
 import com.vanchondo.sso.utilities.ObjectFactory;
 import com.vanchondo.sso.utilities.Validate;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -58,7 +59,7 @@ public class LoginHandlerTest {
   @MockBean
   private AuthenticationService authenticationService;
   @MockBean
-  private ReactiveUserService userService;
+  private UserService userService;
 
   @BeforeEach
   public void setup() {
@@ -100,9 +101,7 @@ public class LoginHandlerTest {
       .exchange()
       .expectStatus().isCreated()
       .expectBody(UserDTO.class)
-      .value(response -> {
-        assertNotNull(response);
-      });
+      .value(Assertions::assertNotNull);
   }
 
   @Test
@@ -117,9 +116,7 @@ public class LoginHandlerTest {
       .exchange()
       .expectStatus().isCreated()
       .expectBody(UserDTO.class)
-      .value(response -> {
-        assertNotNull(response);
-      });
+      .value(Assertions::assertNotNull);
   }
 
   @Test
@@ -136,9 +133,7 @@ public class LoginHandlerTest {
       .exchange()
       .expectStatus().isCreated()
       .expectBody(UserDTO.class)
-      .value(response -> {
-        assertNotNull(response);
-      });
+      .value(Assertions::assertNotNull);
   }
 
   @Test

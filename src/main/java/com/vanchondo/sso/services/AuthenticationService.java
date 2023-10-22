@@ -26,7 +26,7 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 public class AuthenticationService {
 
-    private final ReactiveUserService userService;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final LoginConfiguration loginConfiguration;
 

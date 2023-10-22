@@ -8,7 +8,7 @@ import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UpdateUserDTO;
 import com.vanchondo.sso.services.AuthenticationService;
 import com.vanchondo.sso.services.CaptchaValidatorService;
-import com.vanchondo.sso.services.ReactiveUserService;
+import com.vanchondo.sso.services.UserService;
 import com.vanchondo.sso.utilities.Constants;
 import com.vanchondo.sso.utilities.RegexConstants;
 import com.vanchondo.sso.utilities.Validate;
@@ -28,7 +28,7 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 @Log4j2
 public class LoginHandler {
-  private final ReactiveUserService reactiveUserService;
+  private final UserService userService;
   private final AuthenticationService authenticationService;
   private final Validate validate;
   private final CaptchaValidatorService captchaValidatorService;
@@ -43,7 +43,7 @@ public class LoginHandler {
       )
       .map(user -> (SaveUserDTO)user)
       .flatMap(user ->
-        reactiveUserService.saveUser(user)
+        userService.saveUser(user)
           .flatMap(dto -> ServerResponse.status(HttpStatus.CREATED).bodyValue(dto))
       );
   }
@@ -72,7 +72,7 @@ public class LoginHandler {
       .defaultIfEmpty(new ValidateUserDTO())
       .flatMap(validate::validate)
       .map(validateUser -> (ValidateUserDTO)validateUser)
-      .flatMap(reactiveUserService::validateUser)
+      .flatMap(userService::validateUser)
       .flatMap(result -> ServerResponse.ok().build());
   }
 
@@ -101,7 +101,7 @@ public class LoginHandler {
         if (currentUser == null) {
           return ServerResponse.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return reactiveUserService.deleteUser(user, currentUser)
+        return userService.deleteUser(user, currentUser)
           .flatMap(result ->
             result
               ? ServerResponse.ok().build()
@@ -122,7 +122,7 @@ public class LoginHandler {
         if (currentUser == null) {
           return ServerResponse.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return reactiveUserService.updateUser(user, currentUser)
+        return userService.updateUser(user, currentUser)
           .flatMap(result -> ServerResponse.ok().build());
       });
   }
