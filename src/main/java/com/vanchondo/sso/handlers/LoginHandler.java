@@ -5,6 +5,7 @@ import com.vanchondo.sso.dtos.security.LoginDTO;
 import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.DeleteUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
+import com.vanchondo.sso.dtos.users.UpdateUserDTO;
 import com.vanchondo.sso.services.AuthenticationService;
 import com.vanchondo.sso.services.CaptchaValidatorService;
 import com.vanchondo.sso.services.ReactiveUserService;
@@ -106,6 +107,23 @@ public class LoginHandler {
               ? ServerResponse.ok().build()
               : ServerResponse.badRequest().build()
           );
+      });
+  }
+
+  public Mono<ServerResponse> handleUpdateUser(ServerRequest request) {
+    log.info("::handleUpdateUser::Entering method");
+    return request.bodyToMono(UpdateUserDTO.class)
+      .defaultIfEmpty(new UpdateUserDTO())
+      .flatMap(validate::validate)
+      .map(user -> (UpdateUserDTO)user)
+      .flatMap(user -> {
+        CurrentUserDTO currentUser = (CurrentUserDTO) request.attribute(Constants.CURRENT_USER_ATTRIBUTE)
+          .orElse(null);
+        if (currentUser == null) {
+          return ServerResponse.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return reactiveUserService.updateUser(user, currentUser)
+          .flatMap(result -> ServerResponse.ok().build());
       });
   }
 }

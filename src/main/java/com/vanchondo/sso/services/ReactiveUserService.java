@@ -4,6 +4,7 @@ import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.DeleteUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
+import com.vanchondo.sso.dtos.users.UpdateUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.entities.UserEntity;
 import com.vanchondo.sso.exceptions.BadRequestException;
@@ -149,4 +150,28 @@ public class ReactiveUserService {
       });
   }
 
+  public Mono<UserDTO> updateUser(UpdateUserDTO dto, CurrentUserDTO currentUser){
+    String methodName = "::updateUser::";
+    return userRepository.findByUsername(currentUser.getUsername())
+      .defaultIfEmpty(new UserEntity())
+      .flatMap(entity -> {
+        if (entity == null || StringUtils.isEmpty(entity.getUsername())) {
+          log.warn("{}User not found to update. user={}", methodName, currentUser.getUsername());
+          return Mono.error(new NotFoundException("User not found"));
+        }
+        else {
+          if (passwordEncoder.matches(dto.getCurrentPassword(), entity.getPassword())){
+            entity.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+            entity.setLastUpdatedAt(LocalDateTime.now());
+
+            return userRepository.save(entity)
+              .map(UserDTOMapper::map);
+          }
+          else {
+            log.warn("{}Password is not valid. password={}", methodName, entity.getPassword());
+            return Mono.error(new ConflictException("Password is not valid"));
+          }
+        }
+      });
+  }
 }
