@@ -1,8 +1,10 @@
 package com.vanchondo.sso.handlers;
 
 import com.vanchondo.sso.dtos.security.CurrentUserDTO;
+import com.vanchondo.sso.dtos.security.LoginDTO;
 import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
+import com.vanchondo.sso.services.AuthenticationService;
 import com.vanchondo.sso.services.CaptchaValidatorService;
 import com.vanchondo.sso.services.ReactiveUserService;
 import com.vanchondo.sso.utilities.RegexConstants;
@@ -24,6 +26,7 @@ import reactor.core.publisher.Mono;
 @Log4j2
 public class LoginHandler {
   private final ReactiveUserService reactiveUserService;
+  private final AuthenticationService authenticationService;
   private final Validate validate;
   private final CaptchaValidatorService captchaValidatorService;
 
@@ -42,7 +45,7 @@ public class LoginHandler {
       );
   }
 
-  public Mono<ServerResponse> handleRegex(ServerRequest request) {
+  public Mono<ServerResponse> handleRegex() {
     log.info("::handleRegex::Entering method");
     Map<String, String> regexMap = new HashMap<>();
     regexMap.put("USERNAME_REGEX", RegexConstants.USERNAME_REGEX);
@@ -68,5 +71,15 @@ public class LoginHandler {
       .map(validateUser -> (ValidateUserDTO)validateUser)
       .flatMap(reactiveUserService::validateUser)
       .flatMap(result -> ServerResponse.ok().build());
+  }
+
+  public Mono<ServerResponse> handleLogin(ServerRequest request) {
+    log.info("::handleLogin::Entering method");
+    return  request.bodyToMono(LoginDTO.class)
+      .defaultIfEmpty(new LoginDTO())
+      .flatMap(validate::validate)
+      .map(login -> (LoginDTO)login)
+      .flatMap(authenticationService::login)
+      .flatMap(result -> ServerResponse.ok().bodyValue(result));
   }
 }

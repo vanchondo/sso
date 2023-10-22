@@ -16,8 +16,9 @@ public class LoginRouter {
   @Bean
   public RouterFunction<ServerResponse> loginRoute(LoginHandler loginHandler) {
     return route(POST("/register"), loginHandler::handleRegister)
-      .andRoute(GET("/regex"), loginHandler::handleRegex)
+      .andRoute(GET("/regex"), req -> loginHandler.handleRegex())
       .andRoute(GET("/currentUser"), loginHandler::handleCurrentUser)
-      .andRoute(POST("/validate"), loginHandler::handleValidateUser);
+      .andRoute(POST("/validate"), loginHandler::handleValidateUser)
+      .andRoute(POST("/login"), loginHandler::handleLogin);
   }
 }

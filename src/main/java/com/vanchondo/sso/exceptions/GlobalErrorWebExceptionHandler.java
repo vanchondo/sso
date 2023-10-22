@@ -62,6 +62,12 @@ public class GlobalErrorWebExceptionHandler extends AbstractErrorWebExceptionHan
     else if (error instanceof ReCaptchaInvalidException) {
       return handle((ReCaptchaInvalidException)error, exchange);
     }
+    else if (error instanceof BadRequestException) {
+      return handle((BadRequestException) error, exchange);
+    }
+    else if (error instanceof AuthenticationException) {
+      return handle((AuthenticationException) error, exchange);
+    }
     else {
       return handle((Exception)error, exchange);
     }
@@ -85,6 +91,18 @@ public class GlobalErrorWebExceptionHandler extends AbstractErrorWebExceptionHan
     log.warn(logMessage, ex.getMessage(), ex);
 
     return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), exchange);
+  }
+
+  public static Mono<ServerResponse> handle(BadRequestException ex, ServerWebExchange exchange) {
+    log.warn(logMessage, ex.getMessage(), ex);
+
+    return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), exchange);
+  }
+
+  public static Mono<ServerResponse> handle(AuthenticationException ex, ServerWebExchange exchange) {
+    log.warn(logMessage, ex.getMessage(), ex);
+
+    return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage(), exchange);
   }
 
   public static Mono<ServerResponse> handle(Exception ex, ServerWebExchange exchange) {

@@ -25,85 +25,101 @@ import reactor.core.publisher.Mono;
 @Log4j2
 @AllArgsConstructor
 public class ReactiveUserService {
-    private EmailService emailService;
-    private ReactiveUserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
+  private EmailService emailService;
+  private ReactiveUserRepository userRepository;
+  private PasswordEncoder passwordEncoder;
 
-    public Mono<UserDTO> saveUser(SaveUserDTO dto) {
-        // Check if the email or username already exists
-        Mono<Boolean> emailExists = userRepository.existsByEmail(dto.getEmail());
-        Mono<Boolean> usernameExists = userRepository.existsByUsername(dto.getUsername());
+  public Mono<UserDTO> saveUser(SaveUserDTO dto) {
+    // Check if the email or username already exists
+    Mono<Boolean> emailExists = userRepository.existsByEmail(dto.getEmail());
+    Mono<Boolean> usernameExists = userRepository.existsByUsername(dto.getUsername());
 
-        // Combine the two existence checks
-        return Mono.zip(emailExists, usernameExists)
-          .flatMap(tuple -> {
-              boolean emailExistsValue = tuple.getT1();
-              boolean usernameExistsValue = tuple.getT2();
+    // Combine the two existence checks
+    return Mono.zip(emailExists, usernameExists)
+      .flatMap(tuple -> {
+        boolean emailExistsValue = tuple.getT1();
+        boolean usernameExistsValue = tuple.getT2();
 
-              // If neither email nor username exists, proceed to save the user
-              if (!emailExistsValue && !usernameExistsValue) {
-                  UserEntity entity = UserEntityMapper.map(dto);
-                  entity.setActive(false);
-                  entity.setLastUpdatedAt(LocalDateTime.now());
-                  entity.setPassword(passwordEncoder.encode(entity.getPassword()));
-                  entity.setVerificationToken(dto.isTest()
-                    ? dto.getCaptchaResponse() // Sets captcha response as token
-                    : UUID.randomUUID().toString() // Generates a random UUID
-                  );
+        // If neither email nor username exists, proceed to save the user
+        if (!emailExistsValue && !usernameExistsValue) {
+          UserEntity entity = UserEntityMapper.map(dto);
+          entity.setActive(false);
+          entity.setLastUpdatedAt(LocalDateTime.now());
+          entity.setPassword(passwordEncoder.encode(entity.getPassword()));
+          entity.setVerificationToken(dto.isTest()
+            ? dto.getCaptchaResponse() // Sets captcha response as token
+            : UUID.randomUUID().toString() // Generates a random UUID
+          );
 
-                  return userRepository.save(entity)
-                    .flatMap(stored -> {
-                      if (!dto.isTest()) {
-                        // Send an email to the user and handle exceptions gracefully
-                        return emailService.sendEmailReactive(entity.getEmail(), entity.getVerificationToken())
-                          .thenReturn(stored)
-                          .onErrorResume(ex -> {
-                            log.error("::saveUser:: Error sending email to={}", entity.getEmail(), ex);
-                            return userRepository.delete(entity)
-                                .then(Mono.error(new ConflictException("Error sending email to=" + entity.getEmail())));
-                          });
-                      } else {
-                          return Mono.just(stored);
-                      }
-                    })
-                    .map(UserDTOMapper::map);
+          return userRepository.save(entity)
+            .flatMap(stored -> {
+              if (!dto.isTest()) {
+                // Send an email to the user and handle exceptions gracefully
+                return emailService.sendEmailReactive(entity.getEmail(), entity.getVerificationToken())
+                  .thenReturn(stored)
+                  .onErrorResume(ex -> {
+                    log.error("::saveUser:: Error sending email to={}", entity.getEmail(), ex);
+                    return userRepository.delete(entity)
+                      .then(Mono.error(new ConflictException("Error sending email to=" + entity.getEmail())));
+                  });
               } else {
-                  // If email or username already exists, return a conflict error
-                  return Mono.error(new ConflictException("Email or username already registered"));
+                return Mono.just(stored);
               }
-          });
+            })
+            .map(UserDTOMapper::map);
+        } else {
+          // If email or username already exists, return a conflict error
+          return Mono.error(new ConflictException("Email or username already registered"));
+        }
+      });
+  }
+
+  public Mono<Boolean> validateUser(ValidateUserDTO userDTO) {
+    String email = userDTO.getEmail();
+    String token = userDTO.getToken();
+    String methodName="::validateUser::";
+    log.info("{}Trying to validate email={} token={}", methodName, email, token);
+    if (StringUtils.isEmpty(token) || StringUtils.isEmpty(email)) {
+      log.error("{}Email and/or token are null", methodName);
+      return Mono.error(new NotFoundException("User validation not found"));
     }
+    return userRepository.findByEmail(email)
+      .flatMap(entity -> {
+        if (entity == null) {
+          log.error("{}User registry not found", methodName);
+          return Mono.error(new NotFoundException("User validation not found"));
+        }
+        if (token.equals(entity.getVerificationToken())) {
+          log.info("{}Activating user", methodName);
+          entity.setActive(true);
+          entity.setLastUpdatedAt(LocalDateTime.now());
+          entity.setVerificationToken(null);
+          return userRepository.save(entity)
+            .map(savedUser -> true);
+        }
+        else {
+          log.error("{}Token not valid", methodName);
+          return Mono.error(new BadRequestException("Token not valid"));
+        }
+      });
 
-    public Mono<Boolean> validateUser(ValidateUserDTO userDTO) {
-      String email = userDTO.getEmail();
-      String token = userDTO.getToken();
-      String methodName="::validateUser::";
-      log.info("{}Trying to validate email={} token={}", methodName, email, token);
-      if (StringUtils.isEmpty(token) || StringUtils.isEmpty(email)) {
-        log.error("{}Email and/or token are null", methodName);
-        return Mono.error(new NotFoundException("User validation not found"));
-      }
-      return userRepository.findByEmail(email)
+  }
 
-        .flatMap(entity -> {
-          if (entity == null) {
-            log.error("{}User registry not found", methodName);
-            return Mono.error(new NotFoundException("User validation not found"));
-          }
-          if (token.equals(entity.getVerificationToken())) {
-            log.info("{}Activating user", methodName);
-            entity.setActive(true);
-            entity.setLastUpdatedAt(LocalDateTime.now());
-            entity.setVerificationToken(null);
-            return userRepository.save(entity)
-              .map(savedUser -> true);
-          }
-          else {
-            log.error("{}Token not valid", methodName);
-            return Mono.error(new BadRequestException("Token not valid"));
-          }
-        });
+  public Mono<UserDTO> findUserByUsername(String username) {
+    return findUserEntityByUsername(username)
+      .map(UserDTOMapper::map);
+  }
 
-    }
+  public Mono<UserEntity> findUserEntityByUsername(String username) {
+    return userRepository.findByUsername(username)
+      .flatMap(entity -> {
+        if (entity == null) {
+          log.info("::findUserEntityByUsername::User not found");
+          return Mono.error(new NotFoundException("User not found"));
+        }
+
+        return Mono.just(entity);
+      });
+  }
 
 }

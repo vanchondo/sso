@@ -14,6 +14,7 @@ import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.exceptions.GlobalErrorWebExceptionHandler;
 import com.vanchondo.sso.routers.LoginRouter;
+import com.vanchondo.sso.services.AuthenticationService;
 import com.vanchondo.sso.services.CaptchaValidatorService;
 import com.vanchondo.sso.services.ReactiveUserService;
 import com.vanchondo.sso.utilities.ObjectFactory;
@@ -54,6 +55,8 @@ public class LoginHandlerTest {
 
   @MockBean
   private CaptchaValidatorService captchaValidatorService;
+  @MockBean
+  private AuthenticationService authenticationService;
   @MockBean
   private ReactiveUserService userService;
 
