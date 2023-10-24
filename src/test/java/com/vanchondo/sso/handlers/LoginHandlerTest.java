@@ -13,6 +13,7 @@ import com.vanchondo.sso.dtos.security.CaptchaDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.exceptions.GlobalErrorWebExceptionHandler;
+import com.vanchondo.sso.filters.JwtFilter;
 import com.vanchondo.sso.routers.LoginRouter;
 import com.vanchondo.sso.services.AuthenticationService;
 import com.vanchondo.sso.services.CaptchaValidatorService;
@@ -25,10 +26,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.reactive.ReactiveUserDetailsServiceAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
@@ -42,15 +43,14 @@ import java.util.Map;
 import reactor.core.publisher.Mono;
 
 @ExtendWith({SpringExtension.class})
-@WebFluxTest(excludeAutoConfiguration = {
-  ReactiveSecurityAutoConfiguration.class,
-  ReactiveUserDetailsServiceAutoConfiguration.class
-})
+@WebFluxTest
+@AutoConfigureWebTestClient
 @ContextConfiguration(classes = {
   LoginRouter.class,
   LoginConfiguration.class,
   LoginHandler.class,
   Validate.class,
+  JwtFilter.class,
   GlobalErrorWebExceptionHandler.class
 })
 public class LoginHandlerTest {
@@ -140,7 +140,7 @@ public class LoginHandlerTest {
   }
 
   @Test
-  public void testRegex() {
+  public void testHandleRegex() {
     webTestClient.get()
       .uri("/regex")
       .exchange()
@@ -153,5 +153,24 @@ public class LoginHandlerTest {
         assertEquals(RegexConstants.PASSWORD_REGEX, response.get("PASSWORD_REGEX"));
         assertEquals(RegexConstants.EMAIL_REGEX, response.get("EMAIL_REGEX"));
       });
+  }
+
+  @Test
+  public void testHandleCurrentUserWhenAuthorizationTokenIsNotIncluded() {
+    webTestClient.get()
+      .uri("/currentUser")
+      .exchange()
+      .expectStatus()
+      .isUnauthorized();
+  }
+
+  @Test
+  public void testHandleCurrentUserWhenAuthorizationTokenIsInvalid() {
+    webTestClient.get()
+      .uri("/currentUser")
+      .header(HttpHeaders.AUTHORIZATION,"Bearer invalid token")
+      .exchange()
+      .expectStatus()
+      .isUnauthorized();
   }
 }

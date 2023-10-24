@@ -2,12 +2,12 @@ package com.vanchondo.sso.filters;
 
 import com.vanchondo.sso.configs.properties.LoginConfiguration;
 import com.vanchondo.sso.dtos.security.CurrentUserDTO;
+import com.vanchondo.sso.exceptions.AuthenticationException;
 import com.vanchondo.sso.mappers.CurrentUserDTOMapper;
 import com.vanchondo.sso.services.AuthenticationService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -18,7 +18,6 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
@@ -58,30 +57,26 @@ public class JwtFilter implements WebFilter {
               .stream().findFirst().orElse(Strings.EMPTY);
 
             if (StringUtils.isEmpty(authParam) && (StringUtils.isEmpty(authHeader) || !authHeader.startsWith("Bearer "))) {
-                response.setStatusCode(HttpStatus.UNAUTHORIZED);
-                DataBuffer buffer = response.bufferFactory().wrap(invalidTokenMessage.getBytes(StandardCharsets.UTF_8));
                 // Write the error response
-                return exchange.getResponse().writeWith(Mono.just(buffer)).then(Mono.error(new RuntimeException(invalidTokenMessage)));
+                return Mono.error(new AuthenticationException(invalidTokenMessage));
 
             }
             String token = StringUtils.isEmpty(authHeader) ? authParam : authHeader.substring(7);
 
             try {
                 final Claims claims = Jwts.parserBuilder()
-                        .setSigningKey(
-                                AuthenticationService.getSigningKey(loginConfiguration.getSecretKey())
-                        ).build()
-                        .parseClaimsJws(token)
-                        .getBody();
+                  .setSigningKey(
+                    AuthenticationService.getSigningKey(loginConfiguration.getSecretKey())
+                  ).build()
+                  .parseClaimsJws(token)
+                  .getBody();
                 CurrentUserDTO currentUser = CurrentUserDTOMapper.map(claims);
                 exchange.getAttributes().put("currentUser", currentUser);
 //                response.addHeader("Access-Control-Expose-Headers", "Authorization");
 //                response.addHeader("Authorization", usersService.generateToken(currentUser).getToken());
             } catch (Exception e) {
-                response.setStatusCode(HttpStatus.UNAUTHORIZED);
-                DataBuffer buffer = response.bufferFactory().wrap(invalidTokenMessage.getBytes(StandardCharsets.UTF_8));
                 // Write the error response
-                return exchange.getResponse().writeWith(Mono.just(buffer)).then(Mono.error(new RuntimeException(invalidTokenMessage)));
+                return Mono.error(new AuthenticationException(invalidTokenMessage));
             }
 
             return chain.filter(exchange);
@@ -92,17 +87,17 @@ public class JwtFilter implements WebFilter {
         String cleanedUrl = cleanUrl(path);
 
         return loginConfiguration.getUnsecuredUrls().stream()
-                .anyMatch(urlResource -> {
-                    if (urlResource.getUrl().endsWith("*")){
-                        String url = urlResource.getUrl().substring(0, urlResource.getUrl().length()-1);
-                        return cleanedUrl.contains(url)
-                                && urlResource.getMethods().contains(requestMethod);
-                    }
-                    else {
-                        return cleanedUrl.equals(urlResource.getUrl())
-                                && urlResource.getMethods().contains(requestMethod);
-                    }
-                });
+          .anyMatch(urlResource -> {
+              if (urlResource.getUrl().endsWith("*")){
+                  String url = urlResource.getUrl().substring(0, urlResource.getUrl().length()-1);
+                  return cleanedUrl.contains(url)
+                    && urlResource.getMethods().contains(requestMethod);
+              }
+              else {
+                  return cleanedUrl.equals(urlResource.getUrl())
+                    && urlResource.getMethods().contains(requestMethod);
+              }
+          });
     }
 
     private String cleanUrl(String url) {
