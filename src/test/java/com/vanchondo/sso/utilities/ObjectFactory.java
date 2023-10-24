@@ -2,11 +2,16 @@ package com.vanchondo.sso.utilities;
 
 import static com.vanchondo.sso.services.AuthenticationService.getSigningKey;
 
+import com.vanchondo.sso.configs.properties.UrlResource;
 import com.vanchondo.sso.dtos.security.TokenDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
+import org.springframework.http.HttpMethod;
 
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -52,6 +57,18 @@ public abstract class ObjectFactory {
         SignatureAlgorithm.HS256
       )
       .compact());
+  }
+
+  public static List<UrlResource> createUnsecureUrls() {
+    return Arrays.asList(
+      new UrlResource("/swagger*", Collections.singletonList(HttpMethod.GET.name())),
+      new UrlResource("/v2/api-docs", Collections.singletonList(HttpMethod.GET.name())),
+      new UrlResource("/login", Collections.singletonList(HttpMethod.POST.name())),
+      new UrlResource("/validate", Collections.singletonList(HttpMethod.POST.name())),
+      new UrlResource("/register", Collections.singletonList(HttpMethod.POST.name())),
+      new UrlResource("/regex", Collections.singletonList(HttpMethod.GET.name())),
+      new UrlResource("/users/available", Collections.singletonList(HttpMethod.GET.name()))
+    );
   }
 
 }

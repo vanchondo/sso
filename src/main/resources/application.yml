@@ -33,7 +33,7 @@ com:
         - url: /swagger*
           methods: GET
         - url: /v2/api-docs
-          methods: GET-
+          methods: GET
         - url: /login
           methods: POST
         - url: /validate
