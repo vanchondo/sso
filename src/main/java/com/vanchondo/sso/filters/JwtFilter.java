@@ -5,6 +5,7 @@ import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.exceptions.AuthenticationException;
 import com.vanchondo.sso.mappers.CurrentUserDTOMapper;
 import com.vanchondo.sso.services.AuthenticationService;
+import com.vanchondo.sso.utilities.Constants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.core.annotation.Order;
@@ -56,7 +57,8 @@ public class JwtFilter implements WebFilter {
               .orElse(Collections.emptyList())
               .stream().findFirst().orElse(Strings.EMPTY);
 
-            if (StringUtils.isEmpty(authParam) && (StringUtils.isEmpty(authHeader) || !authHeader.startsWith("Bearer "))) {
+            if (StringUtils.isEmpty(authParam) && (StringUtils.isEmpty(authHeader)
+              || !authHeader.startsWith(Constants.BEARER_VALUE))) {
                 // Write the error response
                 return Mono.error(new AuthenticationException(invalidTokenMessage));
 
@@ -71,7 +73,7 @@ public class JwtFilter implements WebFilter {
                   .parseClaimsJws(token)
                   .getBody();
                 CurrentUserDTO currentUser = CurrentUserDTOMapper.map(claims);
-                exchange.getAttributes().put("currentUser", currentUser);
+                exchange.getAttributes().put(Constants.CURRENT_USER_ATTRIBUTE, currentUser);
 //                response.addHeader("Access-Control-Expose-Headers", "Authorization");
 //                response.addHeader("Authorization", usersService.generateToken(currentUser).getToken());
             } catch (Exception e) {

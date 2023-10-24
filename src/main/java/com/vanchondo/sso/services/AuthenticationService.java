@@ -6,6 +6,7 @@ import com.vanchondo.sso.dtos.security.TokenDTO;
 import com.vanchondo.sso.entities.UserEntity;
 import com.vanchondo.sso.exceptions.AuthenticationException;
 import com.vanchondo.sso.exceptions.NotFoundException;
+import com.vanchondo.sso.utilities.Constants;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -61,7 +62,7 @@ public class AuthenticationService {
         return new TokenDTO(Jwts.builder()
                 .setIssuer(loginConfiguration.getIssuer())
                 .setSubject(currentUser.getEmail())
-                .claim("username", currentUser.getUsername())
+                .claim(Constants.CLAIM_USERNAME_PROPERTY, currentUser.getUsername())
 //            .claim("role", currentUser.getRole().getName())
 //            .claim("authorities", getListOfAuthorities(currentUser.getRole().getAuthorities()))
 //            .claim("store", currentUser.getStore().toString())

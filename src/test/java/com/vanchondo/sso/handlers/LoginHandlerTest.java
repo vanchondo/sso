@@ -10,6 +10,8 @@ import static org.mockito.Mockito.when;
 import com.vanchondo.sso.configs.properties.LoginConfiguration;
 import com.vanchondo.sso.dtos.ErrorDTO;
 import com.vanchondo.sso.dtos.security.CaptchaDTO;
+import com.vanchondo.sso.dtos.security.CurrentUserDTO;
+import com.vanchondo.sso.dtos.security.TokenDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.exceptions.GlobalErrorWebExceptionHandler;
@@ -18,8 +20,10 @@ import com.vanchondo.sso.routers.LoginRouter;
 import com.vanchondo.sso.services.AuthenticationService;
 import com.vanchondo.sso.services.CaptchaValidatorService;
 import com.vanchondo.sso.services.UserService;
+import com.vanchondo.sso.utilities.Constants;
 import com.vanchondo.sso.utilities.ObjectFactory;
 import com.vanchondo.sso.utilities.RegexConstants;
+import com.vanchondo.sso.utilities.TestConstants;
 import com.vanchondo.sso.utilities.Validate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,11 +67,14 @@ public class LoginHandlerTest {
   private AuthenticationService authenticationService;
   @MockBean
   private UserService userService;
+  @MockBean
+  private LoginConfiguration loginConfiguration;
 
   @BeforeEach
   public void setup() {
     when(userService.saveUser(any(SaveUserDTO.class))).thenReturn(Mono.just(new UserDTO()));
     when(captchaValidatorService.validateCaptcha(any(CaptchaDTO.class), any(ServerWebExchange.class))).thenReturn(Mono.just(true));
+    when(loginConfiguration.getSecretKey()).thenReturn(TestConstants.TOKEN_SECRET_KEY);
   }
 
   @Test
@@ -172,5 +179,22 @@ public class LoginHandlerTest {
       .exchange()
       .expectStatus()
       .isUnauthorized();
+  }
+
+  @Test
+  public void testHandleCurrentUser() {
+    TokenDTO tokenDto = ObjectFactory.createTokenDTO();
+    webTestClient.get()
+      .uri("/currentUser")
+      .header(HttpHeaders.AUTHORIZATION, Constants.BEARER_VALUE + tokenDto.getToken())
+      .exchange()
+      .expectStatus()
+      .isOk()
+      .expectBody(CurrentUserDTO.class)
+      .value(response -> {
+        assertNotNull(response);
+        assertEquals(TestConstants.USERNAME, response.getUsername());
+        assertEquals(TestConstants.EMAIL, response.getEmail());
+      });
   }
 }
