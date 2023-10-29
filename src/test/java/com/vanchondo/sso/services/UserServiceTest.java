@@ -7,12 +7,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.entities.UserEntity;
+import com.vanchondo.sso.exceptions.BadRequestException;
 import com.vanchondo.sso.exceptions.ConflictException;
+import com.vanchondo.sso.exceptions.NotFoundException;
 import com.vanchondo.sso.repositories.ReactiveUserRepository;
 import com.vanchondo.sso.utilities.ObjectFactory;
 import com.vanchondo.sso.utilities.TestConstants;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,13 +45,15 @@ public class UserServiceTest {
   public void setup() {
     when(passwordEncoder.encode(anyString())).thenReturn(TestConstants.PASSWORD);
     when(emailService.sendEmailReactive(anyString(), anyString())).thenReturn(Mono.empty());
+    when(userRepository.existsByEmail(anyString())).thenReturn(Mono.just(false));
+    when(userRepository.existsByUsername(anyString())).thenReturn(Mono.just(false));
+    UserEntity userEntity = ObjectFactory.createUserEntity();
+    when(userRepository.save(any(UserEntity.class))).thenReturn(Mono.just(userEntity));
+    when(userRepository.findByEmail(anyString())).thenReturn(Mono.just(userEntity));
   }
 
   @Test
   public void testSaveUserWhenSuccess() {
-    when(userRepository.existsByEmail(anyString())).thenReturn(Mono.just(false));
-    when(userRepository.existsByUsername(anyString())).thenReturn(Mono.just(false));
-    when(userRepository.save(any(UserEntity.class))).thenReturn(Mono.just(ObjectFactory.createUserEntity()));
     SaveUserDTO saveUserDTO = ObjectFactory.createSaveUserDTO();
     saveUserDTO.setTest(false);
     StepVerifier.create(userService.saveUser(saveUserDTO))
@@ -65,9 +71,6 @@ public class UserServiceTest {
 
   @Test
   public void testSaveUserWhenTestIsTrueAndGetSuccess() {
-    when(userRepository.existsByEmail(anyString())).thenReturn(Mono.just(false));
-    when(userRepository.existsByUsername(anyString())).thenReturn(Mono.just(false));
-    when(userRepository.save(any(UserEntity.class))).thenReturn(Mono.just(ObjectFactory.createUserEntity()));
     SaveUserDTO saveUserDTO = ObjectFactory.createSaveUserDTO();
     saveUserDTO.setTest(true);
     StepVerifier.create(userService.saveUser(saveUserDTO))
@@ -87,8 +90,6 @@ public class UserServiceTest {
   @Test
   public void testSaveUserWhenEmailAlreadyExists() {
     when(userRepository.existsByEmail(anyString())).thenReturn(Mono.just(true));
-    when(userRepository.existsByUsername(anyString())).thenReturn(Mono.just(false));
-    when(userRepository.save(any(UserEntity.class))).thenReturn(Mono.just(ObjectFactory.createUserEntity()));
     SaveUserDTO saveUserDTO = ObjectFactory.createSaveUserDTO();
     saveUserDTO.setTest(false);
     StepVerifier.create(userService.saveUser(saveUserDTO))
@@ -98,9 +99,7 @@ public class UserServiceTest {
 
   @Test
   public void testSaveUserWhenUsernameAlreadyExists() {
-    when(userRepository.existsByEmail(anyString())).thenReturn(Mono.just(false));
     when(userRepository.existsByUsername(anyString())).thenReturn(Mono.just(true));
-    when(userRepository.save(any(UserEntity.class))).thenReturn(Mono.just(ObjectFactory.createUserEntity()));
     SaveUserDTO saveUserDTO = ObjectFactory.createSaveUserDTO();
     saveUserDTO.setTest(false);
     StepVerifier.create(userService.saveUser(saveUserDTO))
@@ -110,15 +109,47 @@ public class UserServiceTest {
 
   @Test
   public void testSaveUserWhenSendEmailFails() {
-    when(userRepository.existsByEmail(anyString())).thenReturn(Mono.just(false));
-    when(userRepository.existsByUsername(anyString())).thenReturn(Mono.just(false));
-    when(userRepository.save(any(UserEntity.class))).thenReturn(Mono.just(ObjectFactory.createUserEntity()));
     when(emailService.sendEmailReactive(anyString(), anyString())).thenReturn(Mono.error(new MessagingException()));
     when(userRepository.delete(any(UserEntity.class))).thenReturn(Mono.empty());
     SaveUserDTO saveUserDTO = ObjectFactory.createSaveUserDTO();
     saveUserDTO.setTest(false);
     StepVerifier.create(userService.saveUser(saveUserDTO))
       .expectError(ConflictException.class)
+      .verify();
+  }
+
+  @Test
+  public void testValidateUser() {
+    ValidateUserDTO userDTO = ObjectFactory.createValidateUserDto();
+    StepVerifier.create(userService.validateUser(userDTO))
+      .assertNext(Assertions::assertTrue)
+      .verifyComplete();
+  }
+
+  @Test
+  public void testValidateUserWhenTokenIsEmpty() {
+    ValidateUserDTO userDTO = ObjectFactory.createValidateUserDto();
+    userDTO.setToken(null);
+    StepVerifier.create(userService.validateUser(userDTO))
+      .expectError(NotFoundException.class)
+      .verify();
+  }
+
+  @Test
+  public void testValidateUserWhenUserNotFound() {
+    when(userRepository.findByEmail(anyString())).thenReturn(Mono.empty());
+    ValidateUserDTO userDTO = ObjectFactory.createValidateUserDto();
+    StepVerifier.create(userService.validateUser(userDTO))
+      .expectError(NotFoundException.class)
+      .verify();
+  }
+
+  @Test
+  public void testValidateUserWhenTokenIsNotEquals() {
+    ValidateUserDTO userDTO = ObjectFactory.createValidateUserDto();
+    userDTO.setToken(TestConstants.TOKEN_SECRET_KEY + "12345");
+    StepVerifier.create(userService.validateUser(userDTO))
+      .expectError(BadRequestException.class)
       .verify();
   }
 }

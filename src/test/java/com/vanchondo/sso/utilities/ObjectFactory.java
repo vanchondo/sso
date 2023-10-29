@@ -5,6 +5,7 @@ import static com.vanchondo.sso.services.AuthenticationService.getSigningKey;
 import com.vanchondo.sso.configs.properties.UrlResource;
 import com.vanchondo.sso.dtos.security.LoginDTO;
 import com.vanchondo.sso.dtos.security.TokenDTO;
+import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.entities.UserEntity;
 import org.springframework.http.HttpMethod;
@@ -79,6 +80,7 @@ public abstract class ObjectFactory {
     user.setPassword(TestConstants.PASSWORD);
     user.setEmail(TestConstants.EMAIL);
     user.setUsername(TestConstants.USERNAME);
+    user.setVerificationToken(TestConstants.TOKEN_SECRET_KEY);
 
     return user;
   }
@@ -89,6 +91,14 @@ public abstract class ObjectFactory {
     loginDTO.setPassword(TestConstants.PASSWORD);
 
     return loginDTO;
+  }
+
+  public static ValidateUserDTO createValidateUserDto() {
+    ValidateUserDTO dto = new ValidateUserDTO();
+    dto.setEmail(TestConstants.EMAIL);
+    dto.setToken(TestConstants.TOKEN_SECRET_KEY);
+
+    return dto;
   }
 
 }

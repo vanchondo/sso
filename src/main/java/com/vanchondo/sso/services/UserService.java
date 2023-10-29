@@ -87,8 +87,9 @@ public class UserService {
       return Mono.error(new NotFoundException("User validation not found"));
     }
     return userRepository.findByEmail(email)
+      .defaultIfEmpty(new UserEntity())
       .flatMap(entity -> {
-        if (entity == null) {
+        if (StringUtils.isEmpty(entity.getUsername())) {
           log.error("{}User registry not found", methodName);
           return Mono.error(new NotFoundException("User validation not found"));
         }
