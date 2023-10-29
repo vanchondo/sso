@@ -3,8 +3,10 @@ package com.vanchondo.sso.utilities;
 import static com.vanchondo.sso.services.AuthenticationService.getSigningKey;
 
 import com.vanchondo.sso.configs.properties.UrlResource;
+import com.vanchondo.sso.dtos.security.LoginDTO;
 import com.vanchondo.sso.dtos.security.TokenDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
+import com.vanchondo.sso.entities.UserEntity;
 import org.springframework.http.HttpMethod;
 
 import java.util.Arrays;
@@ -69,6 +71,24 @@ public abstract class ObjectFactory {
       new UrlResource("/regex", Collections.singletonList(HttpMethod.GET.name())),
       new UrlResource("/users/available", Collections.singletonList(HttpMethod.GET.name()))
     );
+  }
+
+  public static UserEntity createUserEntity() {
+    UserEntity user = new UserEntity();
+    user.setActive(true);
+    user.setPassword(TestConstants.PASSWORD);
+    user.setEmail(TestConstants.EMAIL);
+    user.setUsername(TestConstants.USERNAME);
+
+    return user;
+  }
+
+  public static LoginDTO createLoginDto() {
+    LoginDTO loginDTO = new LoginDTO();
+    loginDTO.setUsername(TestConstants.USERNAME);
+    loginDTO.setPassword(TestConstants.PASSWORD);
+
+    return loginDTO;
   }
 
 }

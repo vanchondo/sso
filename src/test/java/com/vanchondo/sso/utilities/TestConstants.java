@@ -8,5 +8,6 @@ public final class TestConstants {
   public static String TOKEN_SECRET_KEY = "WWxoc1ZHUllRbXhqYTFJeFkwZFdlVlV5Vm1wamJWWXdVekpXTlE9PQ==";
   public static String EMAIL = "victor@email.com";
   public static String USERNAME = "validUsername";
+  public static String PASSWORD = "password";
 
 }
