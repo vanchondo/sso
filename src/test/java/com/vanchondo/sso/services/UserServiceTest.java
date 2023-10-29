@@ -11,6 +11,7 @@ import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.DeleteUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
+import com.vanchondo.sso.dtos.users.UpdateUserDTO;
 import com.vanchondo.sso.entities.UserEntity;
 import com.vanchondo.sso.exceptions.BadRequestException;
 import com.vanchondo.sso.exceptions.ConflictException;
@@ -198,6 +199,38 @@ public class UserServiceTest {
     CurrentUserDTO currentUserDTO = ObjectFactory.createCurrentUserDto();
     DeleteUserDTO deleteUserDTO = ObjectFactory.createDeleteUserDto();
     StepVerifier.create(userService.deleteUser(deleteUserDTO, currentUserDTO))
+      .expectError(ConflictException.class)
+      .verify();
+  }
+
+  @Test
+  public void testUpdateUserWhenSuccess() {
+    CurrentUserDTO currentUserDTO = ObjectFactory.createCurrentUserDto();
+    UpdateUserDTO updateUserDTO = ObjectFactory.createUpdateUserDto();
+
+    StepVerifier.create(userService.updateUser(updateUserDTO, currentUserDTO))
+      .assertNext(Assertions::assertNotNull)
+      .verifyComplete();
+  }
+
+  @Test
+  public void testUpdateUserWhenUserNotFound() {
+    when(userRepository.findByUsername(anyString())).thenReturn(Mono.empty());
+    CurrentUserDTO currentUserDTO = ObjectFactory.createCurrentUserDto();
+    UpdateUserDTO updateUserDTO = ObjectFactory.createUpdateUserDto();
+
+    StepVerifier.create(userService.updateUser(updateUserDTO, currentUserDTO))
+      .expectError(NotFoundException.class)
+      .verify();
+  }
+
+  @Test
+  public void testUpdateUserWhenPasswordNotMatch() {
+    when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
+    CurrentUserDTO currentUserDTO = ObjectFactory.createCurrentUserDto();
+    UpdateUserDTO updateUserDTO = ObjectFactory.createUpdateUserDto();
+
+    StepVerifier.create(userService.updateUser(updateUserDTO, currentUserDTO))
       .expectError(ConflictException.class)
       .verify();
   }

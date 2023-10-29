@@ -9,6 +9,7 @@ import com.vanchondo.sso.dtos.security.TokenDTO;
 import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.DeleteUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
+import com.vanchondo.sso.dtos.users.UpdateUserDTO;
 import com.vanchondo.sso.entities.UserEntity;
 import org.springframework.http.HttpMethod;
 
@@ -116,6 +117,14 @@ public abstract class ObjectFactory {
     dto.setEmail(TestConstants.EMAIL);
     dto.setUsername(TestConstants.USERNAME);
     dto.setExp(new Date());
+
+    return dto;
+  }
+
+  public static UpdateUserDTO createUpdateUserDto() {
+    UpdateUserDTO dto = new UpdateUserDTO();
+    dto.setCurrentPassword(TestConstants.PASSWORD);
+    dto.setNewPassword(TestConstants.PASSWORD);
 
     return dto;
   }
