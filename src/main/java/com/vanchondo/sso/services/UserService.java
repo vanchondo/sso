@@ -111,8 +111,9 @@ public class UserService {
 
   public Mono<UserEntity> findUserEntityByUsername(String username) {
     return userRepository.findByUsername(username)
+      .defaultIfEmpty(new UserEntity())
       .flatMap(entity -> {
-        if (entity == null) {
+        if (StringUtils.isEmpty(entity.getUsername())) {
           log.info("::findUserEntityByUsername::User not found");
           return Mono.error(new NotFoundException("User not found"));
         }

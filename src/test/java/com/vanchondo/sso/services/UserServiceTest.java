@@ -50,6 +50,7 @@ public class UserServiceTest {
     UserEntity userEntity = ObjectFactory.createUserEntity();
     when(userRepository.save(any(UserEntity.class))).thenReturn(Mono.just(userEntity));
     when(userRepository.findByEmail(anyString())).thenReturn(Mono.just(userEntity));
+    when(userRepository.findByUsername(anyString())).thenReturn(Mono.just(userEntity));
   }
 
   @Test
@@ -150,6 +151,21 @@ public class UserServiceTest {
     userDTO.setToken(TestConstants.TOKEN_SECRET_KEY + "12345");
     StepVerifier.create(userService.validateUser(userDTO))
       .expectError(BadRequestException.class)
+      .verify();
+  }
+
+  @Test
+  public void testFindUserEntityByUsernameWhenSuccess() {
+    StepVerifier.create(userService.findUserEntityByUsername(TestConstants.USERNAME))
+      .assertNext(Assertions::assertNotNull)
+      .verifyComplete();
+  }
+
+  @Test
+  public void testFindUserEntityByUsernameWhenUserNotFound() {
+    when(userRepository.findByUsername(anyString())).thenReturn(Mono.empty());
+    StepVerifier.create(userService.findUserEntityByUsername(TestConstants.USERNAME))
+      .expectError(NotFoundException.class)
       .verify();
   }
 }
