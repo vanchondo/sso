@@ -7,7 +7,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.dtos.security.ValidateUserDTO;
+import com.vanchondo.sso.dtos.users.DeleteUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.entities.UserEntity;
 import com.vanchondo.sso.exceptions.BadRequestException;
@@ -44,6 +46,7 @@ public class UserServiceTest {
   @BeforeEach
   public void setup() {
     when(passwordEncoder.encode(anyString())).thenReturn(TestConstants.PASSWORD);
+    when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
     when(emailService.sendEmailReactive(anyString(), anyString())).thenReturn(Mono.empty());
     when(userRepository.existsByEmail(anyString())).thenReturn(Mono.just(false));
     when(userRepository.existsByUsername(anyString())).thenReturn(Mono.just(false));
@@ -51,6 +54,7 @@ public class UserServiceTest {
     when(userRepository.save(any(UserEntity.class))).thenReturn(Mono.just(userEntity));
     when(userRepository.findByEmail(anyString())).thenReturn(Mono.just(userEntity));
     when(userRepository.findByUsername(anyString())).thenReturn(Mono.just(userEntity));
+    when(userRepository.delete(any(UserEntity.class))).thenReturn(Mono.empty());
   }
 
   @Test
@@ -166,6 +170,35 @@ public class UserServiceTest {
     when(userRepository.findByUsername(anyString())).thenReturn(Mono.empty());
     StepVerifier.create(userService.findUserEntityByUsername(TestConstants.USERNAME))
       .expectError(NotFoundException.class)
+      .verify();
+  }
+
+  @Test
+  public void testDeleteUserWhenSuccess() {
+    CurrentUserDTO currentUserDTO = ObjectFactory.createCurrentUserDto();
+    DeleteUserDTO deleteUserDTO = ObjectFactory.createDeleteUserDto();
+    StepVerifier.create(userService.deleteUser(deleteUserDTO, currentUserDTO))
+      .assertNext(Assertions::assertTrue)
+      .verifyComplete();
+  }
+
+  @Test
+  public void testDeleteUserWhenUserNotFound() {
+    when(userRepository.findByUsername(anyString())).thenReturn(Mono.empty());
+    CurrentUserDTO currentUserDTO = ObjectFactory.createCurrentUserDto();
+    DeleteUserDTO deleteUserDTO = ObjectFactory.createDeleteUserDto();
+    StepVerifier.create(userService.deleteUser(deleteUserDTO, currentUserDTO))
+      .expectError(NotFoundException.class)
+      .verify();
+  }
+
+  @Test
+  public void testDeleteUserWhenPasswordNotMatch() {
+    when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
+    CurrentUserDTO currentUserDTO = ObjectFactory.createCurrentUserDto();
+    DeleteUserDTO deleteUserDTO = ObjectFactory.createDeleteUserDto();
+    StepVerifier.create(userService.deleteUser(deleteUserDTO, currentUserDTO))
+      .expectError(ConflictException.class)
       .verify();
   }
 }

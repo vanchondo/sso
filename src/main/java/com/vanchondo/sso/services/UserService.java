@@ -127,7 +127,7 @@ public class UserService {
     return userRepository.findByUsername(currentUser.getUsername())
       .defaultIfEmpty(new UserEntity())
       .flatMap(entity -> {
-        if (entity == null || StringUtils.isEmpty(entity.getUsername())) {
+        if (StringUtils.isEmpty(entity.getUsername())) {
           log.warn("{}User not found for deletion. user={}", methodName, currentUser.getUsername());
           return Mono.error(new NotFoundException("User not found"));
         }

@@ -3,9 +3,11 @@ package com.vanchondo.sso.utilities;
 import static com.vanchondo.sso.services.AuthenticationService.getSigningKey;
 
 import com.vanchondo.sso.configs.properties.UrlResource;
+import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.dtos.security.LoginDTO;
 import com.vanchondo.sso.dtos.security.TokenDTO;
 import com.vanchondo.sso.dtos.security.ValidateUserDTO;
+import com.vanchondo.sso.dtos.users.DeleteUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.entities.UserEntity;
 import org.springframework.http.HttpMethod;
@@ -97,6 +99,23 @@ public abstract class ObjectFactory {
     ValidateUserDTO dto = new ValidateUserDTO();
     dto.setEmail(TestConstants.EMAIL);
     dto.setToken(TestConstants.TOKEN_SECRET_KEY);
+
+    return dto;
+  }
+
+  public static DeleteUserDTO createDeleteUserDto() {
+    DeleteUserDTO dto = new DeleteUserDTO();
+    dto.setPassword(TestConstants.PASSWORD);
+    dto.setCaptchaResponse(TestConstants.TOKEN_SECRET_KEY);
+
+    return dto;
+  }
+
+  public static CurrentUserDTO createCurrentUserDto() {
+    CurrentUserDTO dto = new CurrentUserDTO();
+    dto.setEmail(TestConstants.EMAIL);
+    dto.setUsername(TestConstants.USERNAME);
+    dto.setExp(new Date());
 
     return dto;
   }
