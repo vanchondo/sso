@@ -17,6 +17,7 @@ import freemarker.template.TemplateExceptionHandler;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
 import jakarta.mail.Message.RecipientType;
+import jakarta.mail.MessagingException;
 import jakarta.mail.Multipart;
 import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
@@ -67,10 +68,14 @@ public class EmailService {
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(mimeBodyPart);
             message.setContent(multipart);
-
-            Transport.send(message);
-            log.info("{}Email sent successfully to={}", methodName, toEmail);
-            return null;
+            try {
+                Transport.send(message);
+                log.info("{}Email sent successfully to={}", methodName, toEmail);
+            } catch (MessagingException ex) {
+                log.error("{}Error sending message", methodName, ex);
+                return Mono.error(ex);
+            }
+            return Mono.empty();
         }).subscribeOn(Schedulers.boundedElastic()).then(); // Use a separate thread pool for blocking operations
     }
 
