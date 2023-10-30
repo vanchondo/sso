@@ -11,7 +11,9 @@ import com.vanchondo.sso.configs.properties.LoginConfiguration;
 import com.vanchondo.sso.dtos.ErrorDTO;
 import com.vanchondo.sso.dtos.security.CaptchaDTO;
 import com.vanchondo.sso.dtos.security.CurrentUserDTO;
+import com.vanchondo.sso.dtos.security.LoginDTO;
 import com.vanchondo.sso.dtos.security.TokenDTO;
+import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.exceptions.GlobalErrorWebExceptionHandler;
@@ -73,9 +75,11 @@ public class LoginHandlerTest {
   @BeforeEach
   public void setup() {
     when(userService.saveUser(any(SaveUserDTO.class))).thenReturn(Mono.just(new UserDTO()));
+    when(userService.validateUser(any(ValidateUserDTO.class))).thenReturn(Mono.just(true));
     when(captchaValidatorService.validateCaptcha(any(CaptchaDTO.class), any(ServerWebExchange.class))).thenReturn(Mono.just(true));
     when(loginConfiguration.getSecretKey()).thenReturn(TestConstants.TOKEN_SECRET_KEY);
     when(loginConfiguration.getUnsecuredUrls()).thenReturn(ObjectFactory.createUnsecureUrls());
+    when(authenticationService.login(any(LoginDTO.class))).thenReturn(Mono.just(ObjectFactory.createTokenDTO()));
   }
 
   @Test
@@ -197,5 +201,31 @@ public class LoginHandlerTest {
         assertEquals(TestConstants.USERNAME, response.getUsername());
         assertEquals(TestConstants.EMAIL, response.getEmail());
       });
+  }
+
+  @Test
+  public void testValidateWhenSuccess() {
+    ValidateUserDTO dto = ObjectFactory.createValidateUserDto();
+    webTestClient.post()
+      .uri("/validate")
+      .accept(MediaType.APPLICATION_JSON)
+      .contentType(MediaType.APPLICATION_JSON)
+      .body(Mono.just(dto), ValidateUserDTO.class)
+      .exchange()
+      .expectStatus().isOk();
+  }
+
+  @Test
+  public void testLoginWhenSuccess() {
+    LoginDTO dto = ObjectFactory.createLoginDto();
+    webTestClient.post()
+      .uri("/login")
+      .accept(MediaType.APPLICATION_JSON)
+      .contentType(MediaType.APPLICATION_JSON)
+      .body(Mono.just(dto), LoginDTO.class)
+      .exchange()
+      .expectStatus().isOk()
+      .expectBody(TokenDTO.class)
+      .value(Assertions::assertNotNull);
   }
 }

@@ -95,6 +95,7 @@ public abstract class ObjectFactory {
     LoginDTO loginDTO = new LoginDTO();
     loginDTO.setUsername(TestConstants.USERNAME);
     loginDTO.setPassword(TestConstants.PASSWORD);
+    loginDTO.setCaptchaResponse(TestConstants.TOKEN_SECRET_KEY);
 
     return loginDTO;
   }
