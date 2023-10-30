@@ -18,6 +18,12 @@ def jsonwebtoken_version = '0.11.+'
 def swagger_version = '3.0.+'
 def jacoco_version = '0.8.9'
 
+def jacocoExcludeList = [
+        "**/configs/**",
+        "**/dtos/**",
+        "**/entities/**"
+]
+
 repositories {
     mavenCentral()
 }
@@ -85,9 +91,7 @@ jacocoTestReport {
 
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: [
-                    "**/configs/**"
-            ])
+            fileTree(dir: it, exclude: jacocoExcludeList)
         }))
     }
 }
@@ -98,11 +102,15 @@ test {
 }
 
 jacocoTestCoverageVerification {
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: jacocoExcludeList)
+        }))
+    }
     violationRules {
         rule {
             limit {
-//                minimum = 0.8
-                minimum = 0.35
+                minimum = 0.70
             }
         }
     }
