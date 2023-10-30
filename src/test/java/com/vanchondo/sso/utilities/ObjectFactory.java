@@ -3,6 +3,8 @@ package com.vanchondo.sso.utilities;
 import static com.vanchondo.sso.services.AuthenticationService.getSigningKey;
 
 import com.vanchondo.sso.configs.properties.UrlResource;
+import com.vanchondo.sso.dtos.captcha.CaptchaResponseDTO;
+import com.vanchondo.sso.dtos.security.CaptchaDTO;
 import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.dtos.security.LoginDTO;
 import com.vanchondo.sso.dtos.security.TokenDTO;
@@ -18,6 +20,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -125,6 +128,21 @@ public abstract class ObjectFactory {
     UpdateUserDTO dto = new UpdateUserDTO();
     dto.setCurrentPassword(TestConstants.PASSWORD);
     dto.setNewPassword(TestConstants.PASSWORD);
+
+    return dto;
+  }
+
+  public static CaptchaDTO createCaptchaDto() {
+    CaptchaDTO captchaDTO = new CaptchaDTO();
+    captchaDTO.setCaptchaResponse(UUID.randomUUID().toString());
+
+    return captchaDTO;
+  }
+
+  public static CaptchaResponseDTO createCaptchaResponseDTO(boolean success, double score) {
+    CaptchaResponseDTO dto = new CaptchaResponseDTO();
+    dto.setSuccess(success);
+    dto.setScore(score);
 
     return dto;
   }

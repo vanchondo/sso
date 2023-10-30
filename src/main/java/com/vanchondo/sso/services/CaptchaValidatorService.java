@@ -39,33 +39,6 @@ public class CaptchaValidatorService {
         });
   }
 
-  public void reCaptchaSucceeded(String key) {
-    attemptsCache.invalidate(key);
-  }
-
-  public void reCaptchaFailed(String key) {
-    int attempts = attemptsCache.getUnchecked(key);
-    attempts++;
-    attemptsCache.put(key, attempts);
-  }
-
-  public boolean isBlocked(String key) {
-    return attemptsCache.getUnchecked(key) >= configuration.getMaxAttempt();
-  }
-
-  public boolean validateCaptcha(String captchaResponse, String clientIp) {
-    if(isBlocked(clientIp)) {
-      throw new BadRequestException("Client exceeded maximum number of failed attempts");
-    }
-
-    if (!validate(captchaResponse, clientIp)) {
-      reCaptchaFailed(clientIp);
-      throw new ReCaptchaInvalidException("reCaptcha was not successfully validated");
-    }
-
-    return true;
-  }
-
   public Mono<Boolean> validateCaptcha(CaptchaDTO dto, ServerWebExchange exchange) {
     String methodName = "::validateCaptcha::";
     if (configuration.getSecret().equals(dto.getCaptchaResponse())){
@@ -78,13 +51,26 @@ public class CaptchaValidatorService {
     }
   }
 
+  private void reCaptchaSucceeded(String key) {
+    attemptsCache.invalidate(key);
+  }
+
+  private void reCaptchaFailed(String key) {
+    int attempts = attemptsCache.getUnchecked(key);
+    attempts++;
+    attemptsCache.put(key, attempts);
+  }
+
+  private boolean isBlocked(String key) {
+    return attemptsCache.getUnchecked(key) >= configuration.getMaxAttempt();
+  }
+
   private Mono<Boolean> validateCaptchaReactive(String captchaResponse, String clientIp) {
     if(isBlocked(clientIp)) {
       return Mono.error(new BadRequestException("Client exceeded maximum number of failed attempts"));
     }
 
     if (!validate(captchaResponse, clientIp)) {
-      reCaptchaFailed(clientIp);
       return Mono.error(new ReCaptchaInvalidException("reCaptcha was not successfully validated"));
     }
 
