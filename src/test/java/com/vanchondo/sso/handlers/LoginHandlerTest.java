@@ -19,6 +19,7 @@ import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UpdateUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.exceptions.GlobalErrorWebExceptionHandler;
+import com.vanchondo.sso.exceptions.ReCaptchaInvalidException;
 import com.vanchondo.sso.filters.JwtFilter;
 import com.vanchondo.sso.routers.LoginRouter;
 import com.vanchondo.sso.services.AuthenticationService;
@@ -251,6 +252,22 @@ public class LoginHandlerTest {
   @Test
   public void testDeleteUserWhenFail() {
     when(userService.deleteUser(any(DeleteUserDTO.class), any(CurrentUserDTO.class))).thenReturn(Mono.just(false));
+    TokenDTO tokenDto = ObjectFactory.createTokenDTO();
+    DeleteUserDTO dto = ObjectFactory.createDeleteUserDto();
+    webTestClient.method(HttpMethod.DELETE)
+      .uri("/user")
+      .header(HttpHeaders.AUTHORIZATION, Constants.BEARER_VALUE + tokenDto.getToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .contentType(MediaType.APPLICATION_JSON)
+      .body(Mono.just(dto), DeleteUserDTO.class)
+      .exchange()
+      .expectStatus().isBadRequest();
+  }
+
+  @Test
+  public void testDeleteUserWhenCaptchaFails() {
+    when(captchaValidatorService.validateCaptcha(any(CaptchaDTO.class), any(ServerWebExchange.class)))
+      .thenReturn(Mono.error(new ReCaptchaInvalidException("reCaptcha was not successfully validated")));
     TokenDTO tokenDto = ObjectFactory.createTokenDTO();
     DeleteUserDTO dto = ObjectFactory.createDeleteUserDto();
     webTestClient.method(HttpMethod.DELETE)
