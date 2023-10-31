@@ -1,15 +1,17 @@
 package com.vanchondo.sso.entities;
 
-import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import lombok.Data;
 
 @Document("users")
 @Data
-public class UserEntity {
+public class UserEntity implements Serializable {
     @Id
     private String username;
     @Indexed(unique=true)

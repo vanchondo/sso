@@ -38,8 +38,8 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-webflux:${springBoot_version}"
     implementation "org.springframework.boot:spring-boot-starter-data-mongodb:${springBoot_version}"
     implementation "org.springframework.boot:spring-boot-starter-data-mongodb-reactive:${springBoot_version}"
-
     implementation "org.springframework.boot:spring-boot-starter-validation:${springBoot_version}"
+    implementation "org.springframework.boot:spring-boot-starter-data-redis:${springBoot_version}"
 
     implementation "io.springfox:springfox-boot-starter:${swagger_version}"
 
@@ -110,7 +110,7 @@ jacocoTestCoverageVerification {
     violationRules {
         rule {
             limit {
-                minimum = 0.80
+                minimum = 0.85
             }
         }
     }

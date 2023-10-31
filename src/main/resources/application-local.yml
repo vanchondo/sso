@@ -13,3 +13,10 @@ com:
   vanchondo:
     login:
       secretKey: ENC(q5X1D4JC2mH1b7IBcDpMu3ZpKAW9tWkp03Qgj9+5M5VmigUqrekNyTM47uE+Q0PU2ehDpsfIZpz7mAtefrQkyX3Hvmnslfwhc6PXUpf1G4U=)
+
+
+logging:
+  level:
+    org:
+      springframework:
+        cache: DEBUG

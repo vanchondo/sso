@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.vanchondo.sso.cacheServices.UserCacheService;
 import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.DeleteUserDTO;
@@ -16,7 +17,6 @@ import com.vanchondo.sso.entities.UserEntity;
 import com.vanchondo.sso.exceptions.BadRequestException;
 import com.vanchondo.sso.exceptions.ConflictException;
 import com.vanchondo.sso.exceptions.NotFoundException;
-import com.vanchondo.sso.repositories.ReactiveUserRepository;
 import com.vanchondo.sso.utilities.ObjectFactory;
 import com.vanchondo.sso.utilities.TestConstants;
 import org.junit.jupiter.api.Assertions;
@@ -38,7 +38,7 @@ public class UserServiceTest {
   @Mock
   private EmailService emailService;
   @Mock
-  private ReactiveUserRepository userRepository;
+  private UserCacheService userRepository;
   @Mock
   private PasswordEncoder passwordEncoder;
   @InjectMocks
@@ -143,7 +143,7 @@ public class UserServiceTest {
 
   @Test
   public void testValidateUserWhenUserNotFound() {
-    when(userRepository.findByEmail(anyString())).thenReturn(Mono.empty());
+    when(userRepository.findByEmail(anyString())).thenReturn(Mono.just(new UserEntity()));
     ValidateUserDTO userDTO = ObjectFactory.createValidateUserDto();
     StepVerifier.create(userService.validateUser(userDTO))
       .expectError(NotFoundException.class)
@@ -168,7 +168,7 @@ public class UserServiceTest {
 
   @Test
   public void testFindUserEntityByUsernameWhenUserNotFound() {
-    when(userRepository.findByUsername(anyString())).thenReturn(Mono.empty());
+    when(userRepository.findByUsername(anyString())).thenReturn(Mono.just(new UserEntity()));
     StepVerifier.create(userService.findUserEntityByUsername(TestConstants.USERNAME))
       .expectError(NotFoundException.class)
       .verify();
@@ -185,7 +185,7 @@ public class UserServiceTest {
 
   @Test
   public void testDeleteUserWhenUserNotFound() {
-    when(userRepository.findByUsername(anyString())).thenReturn(Mono.empty());
+    when(userRepository.findByUsername(anyString())).thenReturn(Mono.just(new UserEntity()));
     CurrentUserDTO currentUserDTO = ObjectFactory.createCurrentUserDto();
     DeleteUserDTO deleteUserDTO = ObjectFactory.createDeleteUserDto();
     StepVerifier.create(userService.deleteUser(deleteUserDTO, currentUserDTO))

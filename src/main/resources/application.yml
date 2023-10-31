@@ -2,6 +2,14 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
+  data:
+    redis:
+      host: 192.168.1.68
+      port: 6379
+  cache:
+    redis:
+      key-prefix: sso-svc
+    type: redis
 
 mail:
   smtp:
