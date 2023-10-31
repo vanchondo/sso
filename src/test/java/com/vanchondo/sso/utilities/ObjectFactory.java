@@ -12,6 +12,7 @@ import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.DeleteUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UpdateUserDTO;
+import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.entities.UserEntity;
 import org.springframework.http.HttpMethod;
 
@@ -144,6 +145,14 @@ public abstract class ObjectFactory {
     CaptchaResponseDTO dto = new CaptchaResponseDTO();
     dto.setSuccess(success);
     dto.setScore(score);
+
+    return dto;
+  }
+
+  public static UserDTO createUserDto() {
+    UserDTO dto = new UserDTO();
+    dto.setEmail(TestConstants.EMAIL);
+    dto.setUsername(TestConstants.USERNAME);
 
     return dto;
   }

@@ -16,6 +16,7 @@ import com.vanchondo.sso.dtos.security.TokenDTO;
 import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.DeleteUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
+import com.vanchondo.sso.dtos.users.UpdateUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.exceptions.GlobalErrorWebExceptionHandler;
 import com.vanchondo.sso.filters.JwtFilter;
@@ -79,6 +80,7 @@ public class LoginHandlerTest {
     when(userService.saveUser(any(SaveUserDTO.class))).thenReturn(Mono.just(new UserDTO()));
     when(userService.validateUser(any(ValidateUserDTO.class))).thenReturn(Mono.just(true));
     when(userService.deleteUser(any(DeleteUserDTO.class), any(CurrentUserDTO.class))).thenReturn(Mono.just(true));
+    when(userService.updateUser(any(UpdateUserDTO.class), any(CurrentUserDTO.class))).thenReturn(Mono.just(ObjectFactory.createUserDto()));
     when(captchaValidatorService.validateCaptcha(any(CaptchaDTO.class), any(ServerWebExchange.class))).thenReturn(Mono.just(true));
     when(loginConfiguration.getSecretKey()).thenReturn(TestConstants.TOKEN_SECRET_KEY);
     when(loginConfiguration.getUnsecuredUrls()).thenReturn(ObjectFactory.createUnsecureUrls());
@@ -241,7 +243,7 @@ public class LoginHandlerTest {
       .header(HttpHeaders.AUTHORIZATION, Constants.BEARER_VALUE + tokenDto.getToken())
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
-      .body(Mono.just(dto), SaveUserDTO.class)
+      .body(Mono.just(dto), DeleteUserDTO.class)
       .exchange()
       .expectStatus().isOk();
   }
@@ -256,9 +258,23 @@ public class LoginHandlerTest {
       .header(HttpHeaders.AUTHORIZATION, Constants.BEARER_VALUE + tokenDto.getToken())
       .accept(MediaType.APPLICATION_JSON)
       .contentType(MediaType.APPLICATION_JSON)
-      .body(Mono.just(dto), SaveUserDTO.class)
+      .body(Mono.just(dto), DeleteUserDTO.class)
       .exchange()
       .expectStatus().isBadRequest();
+  }
+
+  @Test
+  public void testUpdateUserWhenSuccess() {
+    TokenDTO tokenDto = ObjectFactory.createTokenDTO();
+    UpdateUserDTO dto = ObjectFactory.createUpdateUserDto();
+    webTestClient.put()
+      .uri("/user")
+      .header(HttpHeaders.AUTHORIZATION, Constants.BEARER_VALUE + tokenDto.getToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .contentType(MediaType.APPLICATION_JSON)
+      .body(Mono.just(dto), UpdateUserDTO.class)
+      .exchange()
+      .expectStatus().isOk();
   }
 
 }
