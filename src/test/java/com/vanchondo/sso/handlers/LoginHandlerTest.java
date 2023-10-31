@@ -14,6 +14,7 @@ import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.dtos.security.LoginDTO;
 import com.vanchondo.sso.dtos.security.TokenDTO;
 import com.vanchondo.sso.dtos.security.ValidateUserDTO;
+import com.vanchondo.sso.dtos.users.DeleteUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.exceptions.GlobalErrorWebExceptionHandler;
@@ -36,6 +37,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
@@ -76,6 +78,7 @@ public class LoginHandlerTest {
   public void setup() {
     when(userService.saveUser(any(SaveUserDTO.class))).thenReturn(Mono.just(new UserDTO()));
     when(userService.validateUser(any(ValidateUserDTO.class))).thenReturn(Mono.just(true));
+    when(userService.deleteUser(any(DeleteUserDTO.class), any(CurrentUserDTO.class))).thenReturn(Mono.just(true));
     when(captchaValidatorService.validateCaptcha(any(CaptchaDTO.class), any(ServerWebExchange.class))).thenReturn(Mono.just(true));
     when(loginConfiguration.getSecretKey()).thenReturn(TestConstants.TOKEN_SECRET_KEY);
     when(loginConfiguration.getUnsecuredUrls()).thenReturn(ObjectFactory.createUnsecureUrls());
@@ -228,4 +231,34 @@ public class LoginHandlerTest {
       .expectBody(TokenDTO.class)
       .value(Assertions::assertNotNull);
   }
+
+  @Test
+  public void testDeleteUserWhenSuccess() {
+    TokenDTO tokenDto = ObjectFactory.createTokenDTO();
+    DeleteUserDTO dto = ObjectFactory.createDeleteUserDto();
+    webTestClient.method(HttpMethod.DELETE)
+      .uri("/user")
+      .header(HttpHeaders.AUTHORIZATION, Constants.BEARER_VALUE + tokenDto.getToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .contentType(MediaType.APPLICATION_JSON)
+      .body(Mono.just(dto), SaveUserDTO.class)
+      .exchange()
+      .expectStatus().isOk();
+  }
+
+  @Test
+  public void testDeleteUserWhenFail() {
+    when(userService.deleteUser(any(DeleteUserDTO.class), any(CurrentUserDTO.class))).thenReturn(Mono.just(false));
+    TokenDTO tokenDto = ObjectFactory.createTokenDTO();
+    DeleteUserDTO dto = ObjectFactory.createDeleteUserDto();
+    webTestClient.method(HttpMethod.DELETE)
+      .uri("/user")
+      .header(HttpHeaders.AUTHORIZATION, Constants.BEARER_VALUE + tokenDto.getToken())
+      .accept(MediaType.APPLICATION_JSON)
+      .contentType(MediaType.APPLICATION_JSON)
+      .body(Mono.just(dto), SaveUserDTO.class)
+      .exchange()
+      .expectStatus().isBadRequest();
+  }
+
 }
