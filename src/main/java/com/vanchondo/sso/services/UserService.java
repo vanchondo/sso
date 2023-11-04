@@ -1,6 +1,5 @@
 package com.vanchondo.sso.services;
 
-import com.vanchondo.sso.cacheServices.UserCacheService;
 import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.DeleteUserDTO;
@@ -13,6 +12,7 @@ import com.vanchondo.sso.exceptions.ConflictException;
 import com.vanchondo.sso.exceptions.NotFoundException;
 import com.vanchondo.sso.mappers.UserDTOMapper;
 import com.vanchondo.sso.mappers.UserEntityMapper;
+import com.vanchondo.sso.repositories.UserRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,13 +29,13 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 public class UserService {
   private final EmailService emailService;
-  private final UserCacheService userCacheService;
+  private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
 
   public Mono<UserDTO> saveUser(SaveUserDTO dto) {
     // Check if the email or username already exists
-    Mono<Boolean> emailExists = userCacheService.existsByEmail(dto.getEmail());
-    Mono<Boolean> usernameExists = userCacheService.existsByUsername(dto.getUsername());
+    Mono<Boolean> emailExists = userRepository.existsByEmail(dto.getEmail());
+    Mono<Boolean> usernameExists = userRepository.existsByUsername(dto.getUsername());
 
     // Combine the two existence checks
     return Mono.zip(emailExists, usernameExists)
@@ -54,7 +54,7 @@ public class UserService {
             : UUID.randomUUID().toString() // Generates a random UUID
           );
 
-          return userCacheService.save(entity)
+          return userRepository.save(entity)
             .flatMap(stored -> {
               if (!dto.isTest()) {
                 // Send an email to the user and handle exceptions gracefully
@@ -62,7 +62,7 @@ public class UserService {
                   .thenReturn(stored)
                   .onErrorResume(ex -> {
                     log.error("::saveUser:: Error sending email to={}", entity.getEmail(), ex);
-                    return userCacheService.delete(entity)
+                    return userRepository.delete(entity)
                       .then(Mono.error(new ConflictException("Error sending email to=" + entity.getEmail())));
                   });
               } else {
@@ -86,7 +86,8 @@ public class UserService {
       log.error("{}Email and/or token are null", methodName);
       return Mono.error(new NotFoundException("User validation not found"));
     }
-    return userCacheService.findByEmail(email)
+    return userRepository.findByEmail(email)
+      .defaultIfEmpty(new UserEntity())
       .flatMap(entity -> {
         if (StringUtils.isEmpty(entity.getUsername())) {
           log.error("{}User registry not found", methodName);
@@ -97,7 +98,7 @@ public class UserService {
           entity.setActive(true);
           entity.setLastUpdatedAt(LocalDateTime.now());
           entity.setVerificationToken(null);
-          return userCacheService.save(entity)
+          return userRepository.save(entity)
             .map(savedUser -> true);
         }
         else {
@@ -111,7 +112,8 @@ public class UserService {
   public Mono<UserEntity> findUserEntityByUsername(String username) {
     String methodName = "::callFindUserEntityByUserName::";
     log.info("{}Entering method", methodName);
-    return userCacheService.findByUsername(username)
+    return userRepository.findByUsername(username)
+      .defaultIfEmpty(new UserEntity())
       .flatMap(entity -> {
         if (StringUtils.isEmpty(entity.getUsername())) {
           log.info("{}User not found", methodName);
@@ -124,7 +126,8 @@ public class UserService {
 
   public Mono<Boolean> deleteUser(DeleteUserDTO dto, CurrentUserDTO currentUser){
     String methodName = "::deleteUser::";
-    return userCacheService.findByUsername(currentUser.getUsername())
+    return userRepository.findByUsername(currentUser.getUsername())
+      .defaultIfEmpty(new UserEntity())
       .flatMap(entity -> {
         if (StringUtils.isEmpty(entity.getUsername())) {
           log.warn("{}User not found for deletion. user={}", methodName, currentUser.getUsername());
@@ -132,7 +135,7 @@ public class UserService {
         }
         else {
           if (passwordEncoder.matches(dto.getPassword(), entity.getPassword())){
-            return userCacheService.delete(entity)
+            return userRepository.delete(entity)
               .then(Mono.defer(() -> {
                 log.info("{}User deleted successfully. user={}", methodName, currentUser.getUsername());
                 return Mono.just(true);
@@ -148,7 +151,7 @@ public class UserService {
 
   public Mono<UserDTO> updateUser(UpdateUserDTO dto, CurrentUserDTO currentUser){
     String methodName = "::updateUser::";
-    return userCacheService.findByUsername(currentUser.getUsername())
+    return userRepository.findByUsername(currentUser.getUsername())
       .defaultIfEmpty(new UserEntity())
       .flatMap(entity -> {
         if (entity == null || StringUtils.isEmpty(entity.getUsername())) {
@@ -160,7 +163,7 @@ public class UserService {
             entity.setPassword(passwordEncoder.encode(dto.getNewPassword()));
             entity.setLastUpdatedAt(LocalDateTime.now());
 
-            return userCacheService.save(entity)
+            return userRepository.save(entity)
               .map(UserDTOMapper::map);
           }
           else {

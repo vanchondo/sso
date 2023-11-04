@@ -7,7 +7,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.vanchondo.sso.cacheServices.UserCacheService;
 import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.DeleteUserDTO;
@@ -17,6 +16,7 @@ import com.vanchondo.sso.entities.UserEntity;
 import com.vanchondo.sso.exceptions.BadRequestException;
 import com.vanchondo.sso.exceptions.ConflictException;
 import com.vanchondo.sso.exceptions.NotFoundException;
+import com.vanchondo.sso.repositories.UserRepository;
 import com.vanchondo.sso.utilities.ObjectFactory;
 import com.vanchondo.sso.utilities.TestConstants;
 import org.junit.jupiter.api.Assertions;
@@ -38,7 +38,7 @@ public class UserServiceTest {
   @Mock
   private EmailService emailService;
   @Mock
-  private UserCacheService userRepository;
+  private UserRepository userRepository;
   @Mock
   private PasswordEncoder passwordEncoder;
   @InjectMocks

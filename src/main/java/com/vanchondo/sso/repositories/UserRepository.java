@@ -1,10 +1,14 @@
 package com.vanchondo.sso.repositories;
 
 import com.vanchondo.sso.entities.UserEntity;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
-public interface UserRepository extends MongoRepository<UserEntity, String> {
+import reactor.core.publisher.Mono;
 
-    UserEntity findByUsername(String username);
-    UserEntity findByEmail(String email);
+public interface UserRepository extends ReactiveMongoRepository<UserEntity, String> {
+
+    Mono<UserEntity> findByUsername(String username);
+    Mono<UserEntity> findByEmail(String email);
+    Mono<Boolean> existsByUsername(String username);
+    Mono<Boolean> existsByEmail(String email);
 }
