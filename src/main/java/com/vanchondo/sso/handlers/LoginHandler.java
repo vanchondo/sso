@@ -14,6 +14,7 @@ import com.vanchondo.sso.utilities.Constants;
 import com.vanchondo.sso.utilities.LogUtil;
 import com.vanchondo.sso.utilities.RegexConstants;
 import com.vanchondo.sso.utilities.Validate;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -144,9 +146,16 @@ public class LoginHandler {
       .map(currentUser -> (CurrentUserDTO)currentUser)
       .map(userService::getProfilePicture)
       .orElse(Mono.just(new PictureEntity()))
-      .flatMap(profilePicture -> ServerResponse.ok()
-        .contentType(MediaType.valueOf(profilePicture.getType()))
-        .bodyValue(profilePicture.getPicture()));
+      .flatMap(profilePicture -> {
+        String mimeType = Optional.ofNullable(profilePicture.getType())
+          .orElse(MediaType.IMAGE_JPEG_VALUE);
+        byte[] picture = profilePicture.getPicture();
+        return ArrayUtils.isEmpty(picture)
+          ? ServerResponse.noContent().build()
+          : ServerResponse.ok()
+            .contentType(MediaType.valueOf(mimeType))
+            .bodyValue(picture);
+      });
 
   }
 }

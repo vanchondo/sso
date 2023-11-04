@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 import lombok.AllArgsConstructor;
@@ -179,6 +180,9 @@ public class UserService {
     String methodName = LogUtil.getMethodName(new Object(){});
     log.info("{}Entering method", methodName);
     return findUserEntityByUsername(currentUser.getUsername())
-      .map(UserEntity::getProfilePicture);
+      .map(entity -> Optional.ofNullable(entity)
+        .map(UserEntity::getProfilePicture)
+        .orElse(new PictureEntity()))
+      .defaultIfEmpty(new PictureEntity());
   }
 }

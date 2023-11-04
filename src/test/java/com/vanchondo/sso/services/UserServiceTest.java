@@ -234,4 +234,12 @@ public class UserServiceTest {
       .expectError(ConflictException.class)
       .verify();
   }
+
+  @Test
+  public void testGetProfilePicture() {
+    CurrentUserDTO currentUserDTO = ObjectFactory.createCurrentUserDto();
+    StepVerifier.create(userService.getProfilePicture(currentUserDTO))
+      .assertNext(Assertions::assertNotNull)
+      .verifyComplete();
+  }
 }

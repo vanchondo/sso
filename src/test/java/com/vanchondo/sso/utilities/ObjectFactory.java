@@ -13,8 +13,10 @@ import com.vanchondo.sso.dtos.users.DeleteUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UpdateUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
+import com.vanchondo.sso.entities.PictureEntity;
 import com.vanchondo.sso.entities.UserEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -91,8 +93,16 @@ public abstract class ObjectFactory {
     user.setEmail(TestConstants.EMAIL);
     user.setUsername(TestConstants.USERNAME);
     user.setVerificationToken(TestConstants.TOKEN_SECRET_KEY);
+    user.setProfilePicture(createPictureEntity());
 
     return user;
+  }
+
+  public static PictureEntity createPictureEntity() {
+    return new PictureEntity(
+      MediaType.IMAGE_JPEG_VALUE,
+      new byte[0]
+    );
   }
 
   public static LoginDTO createLoginDto() {
