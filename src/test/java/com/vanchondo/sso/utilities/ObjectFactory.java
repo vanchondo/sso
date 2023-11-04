@@ -18,6 +18,7 @@ import com.vanchondo.sso.entities.UserEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
@@ -99,9 +100,13 @@ public abstract class ObjectFactory {
   }
 
   public static PictureEntity createPictureEntity() {
+    return createPictureEntity(TestConstants.PICTURE_BASE64.getBytes(StandardCharsets.UTF_8));
+  }
+
+  public static PictureEntity createPictureEntity(byte[] content) {
     return new PictureEntity(
       MediaType.IMAGE_JPEG_VALUE,
-      new byte[0]
+      content
     );
   }
 

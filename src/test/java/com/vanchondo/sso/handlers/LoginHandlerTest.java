@@ -82,6 +82,7 @@ public class LoginHandlerTest {
     when(userService.validateUser(any(ValidateUserDTO.class))).thenReturn(Mono.just(true));
     when(userService.deleteUser(any(DeleteUserDTO.class), any(CurrentUserDTO.class))).thenReturn(Mono.just(true));
     when(userService.updateUser(any(UpdateUserDTO.class), any(CurrentUserDTO.class))).thenReturn(Mono.just(ObjectFactory.createUserDto()));
+    when(userService.getProfilePicture(any(CurrentUserDTO.class))).thenReturn(Mono.just(ObjectFactory.createPictureEntity()));
     when(captchaValidatorService.validateCaptcha(any(CaptchaDTO.class), any(ServerWebExchange.class))).thenReturn(Mono.just(true));
     when(loginConfiguration.getSecretKey()).thenReturn(TestConstants.TOKEN_SECRET_KEY);
     when(loginConfiguration.getUnsecuredUrls()).thenReturn(ObjectFactory.createUnsecureUrls());
@@ -294,4 +295,26 @@ public class LoginHandlerTest {
       .expectStatus().isOk();
   }
 
+  @Test
+  public void testProfilePicture() {
+    TokenDTO tokenDto = ObjectFactory.createTokenDTO();
+    webTestClient.get()
+      .uri("/profilePicture")
+      .header(HttpHeaders.AUTHORIZATION, Constants.BEARER_VALUE + tokenDto.getToken())
+      .accept(MediaType.IMAGE_JPEG)
+      .exchange()
+      .expectStatus().isOk();
+  }
+
+  @Test
+  public void testProfilePictureWhenPictureIsEmpty() {
+    when(userService.getProfilePicture(any(CurrentUserDTO.class))).thenReturn(Mono.just(ObjectFactory.createPictureEntity(new byte[0])));
+    TokenDTO tokenDto = ObjectFactory.createTokenDTO();
+    webTestClient.get()
+      .uri("/profilePicture")
+      .header(HttpHeaders.AUTHORIZATION, Constants.BEARER_VALUE + tokenDto.getToken())
+      .accept(MediaType.IMAGE_JPEG)
+      .exchange()
+      .expectStatus().isNoContent();
+  }
 }
