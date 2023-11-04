@@ -6,13 +6,16 @@ import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.DeleteUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UpdateUserDTO;
+import com.vanchondo.sso.entities.PictureEntity;
 import com.vanchondo.sso.services.AuthenticationService;
 import com.vanchondo.sso.services.CaptchaValidatorService;
 import com.vanchondo.sso.services.UserService;
 import com.vanchondo.sso.utilities.Constants;
+import com.vanchondo.sso.utilities.LogUtil;
 import com.vanchondo.sso.utilities.RegexConstants;
 import com.vanchondo.sso.utilities.Validate;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -34,7 +37,8 @@ public class LoginHandler {
   private final CaptchaValidatorService captchaValidatorService;
 
   public Mono<ServerResponse> handleRegister(ServerRequest request) {
-    log.info("::handleRegister::Entering method");
+    String methodName = LogUtil.getMethodName(new Object(){});
+    log.info("{}Entering method", methodName);
     return request.bodyToMono(SaveUserDTO.class)
       .defaultIfEmpty(new SaveUserDTO())
       .flatMap(dto ->
@@ -49,7 +53,8 @@ public class LoginHandler {
   }
 
   public Mono<ServerResponse> handleRegex() {
-    log.info("::handleRegex::Entering method");
+    String methodName = LogUtil.getMethodName(new Object(){});
+    log.info("{}Entering method", methodName);
     Map<String, String> regexMap = new HashMap<>();
     regexMap.put("USERNAME_REGEX", RegexConstants.USERNAME_REGEX);
     regexMap.put("PASSWORD_REGEX", RegexConstants.PASSWORD_REGEX);
@@ -59,7 +64,8 @@ public class LoginHandler {
   }
 
   public Mono<ServerResponse> handleCurrentUser(ServerRequest request) {
-    log.info("::handleCurrentUser::Entering method");
+    String methodName = LogUtil.getMethodName(new Object(){});
+    log.info("{}Entering method", methodName);
     return request.attribute(Constants.CURRENT_USER_ATTRIBUTE)
       .map(currentUser -> (CurrentUserDTO)currentUser)
       .map(currentUser -> ServerResponse.ok().bodyValue(currentUser))
@@ -67,7 +73,8 @@ public class LoginHandler {
   }
 
   public Mono<ServerResponse> handleValidateUser(ServerRequest request) {
-    log.info("::handleValidateUser::Entering method");
+    String methodName = LogUtil.getMethodName(new Object(){});
+    log.info("{}Entering method", methodName);
     return request.bodyToMono(ValidateUserDTO.class)
       .defaultIfEmpty(new ValidateUserDTO())
       .flatMap(validate::validate)
@@ -77,7 +84,8 @@ public class LoginHandler {
   }
 
   public Mono<ServerResponse> handleLogin(ServerRequest request) {
-    log.info("::handleLogin::Entering method");
+    String methodName = LogUtil.getMethodName(new Object(){});
+    log.info("{}Entering method", methodName);
     return request.bodyToMono(LoginDTO.class)
       .defaultIfEmpty(new LoginDTO())
       .flatMap(validate::validate)
@@ -87,7 +95,8 @@ public class LoginHandler {
   }
 
   public Mono<ServerResponse> handleDeleteUser(ServerRequest request) {
-    log.info("::handleDeleteUser::Entering method");
+    String methodName = LogUtil.getMethodName(new Object(){});
+    log.info("{}Entering method", methodName);
     return request.bodyToMono(DeleteUserDTO.class)
       .defaultIfEmpty(new DeleteUserDTO())
       .flatMap(dto ->
@@ -111,7 +120,8 @@ public class LoginHandler {
   }
 
   public Mono<ServerResponse> handleUpdateUser(ServerRequest request) {
-    log.info("::handleUpdateUser::Entering method");
+    String methodName = LogUtil.getMethodName(new Object(){});
+    log.info("{}Entering method", methodName);
     return request.bodyToMono(UpdateUserDTO.class)
       .defaultIfEmpty(new UpdateUserDTO())
       .flatMap(validate::validate)
@@ -125,5 +135,18 @@ public class LoginHandler {
         return userService.updateUser(user, currentUser)
           .flatMap(result -> ServerResponse.ok().build());
       });
+  }
+
+  public Mono<ServerResponse> handleProfilePicture(ServerRequest request) {
+    String methodName = LogUtil.getMethodName(new Object(){});
+    log.info("{}Entering method", methodName);
+    return request.attribute(Constants.CURRENT_USER_ATTRIBUTE)
+      .map(currentUser -> (CurrentUserDTO)currentUser)
+      .map(userService::getProfilePicture)
+      .orElse(Mono.just(new PictureEntity()))
+      .flatMap(profilePicture -> ServerResponse.ok()
+        .contentType(MediaType.valueOf(profilePicture.getType()))
+        .bodyValue(profilePicture.getPicture()));
+
   }
 }

@@ -19,6 +19,4 @@ public class UserDTO {
     @NotNull (message = "Email is required")
     @Pattern(regexp = RegexConstants.EMAIL_REGEX, message = "Email not valid")
     private String email;
-
-    private byte[] profilePicture;
 }

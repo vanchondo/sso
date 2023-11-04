@@ -6,6 +6,7 @@ import com.vanchondo.sso.dtos.users.DeleteUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
 import com.vanchondo.sso.dtos.users.UpdateUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
+import com.vanchondo.sso.entities.PictureEntity;
 import com.vanchondo.sso.entities.UserEntity;
 import com.vanchondo.sso.exceptions.BadRequestException;
 import com.vanchondo.sso.exceptions.ConflictException;
@@ -13,6 +14,7 @@ import com.vanchondo.sso.exceptions.NotFoundException;
 import com.vanchondo.sso.mappers.UserDTOMapper;
 import com.vanchondo.sso.mappers.UserEntityMapper;
 import com.vanchondo.sso.repositories.UserRepository;
+import com.vanchondo.sso.utilities.LogUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,8 @@ public class UserService {
   private final PasswordEncoder passwordEncoder;
 
   public Mono<UserDTO> saveUser(SaveUserDTO dto) {
+    String methodName = LogUtil.getMethodName(new Object(){});
+    log.info("{}Entering method", methodName);
     // Check if the email or username already exists
     Mono<Boolean> emailExists = userRepository.existsByEmail(dto.getEmail());
     Mono<Boolean> usernameExists = userRepository.existsByUsername(dto.getUsername());
@@ -61,7 +65,7 @@ public class UserService {
                 return emailService.sendEmailReactive(entity.getEmail(), entity.getVerificationToken())
                   .thenReturn(stored)
                   .onErrorResume(ex -> {
-                    log.error("::saveUser:: Error sending email to={}", entity.getEmail(), ex);
+                    log.error("{} Error sending email to={}", methodName, entity.getEmail(), ex);
                     return userRepository.delete(entity)
                       .then(Mono.error(new ConflictException("Error sending email to=" + entity.getEmail())));
                   });
@@ -78,9 +82,10 @@ public class UserService {
   }
 
   public Mono<Boolean> validateUser(ValidateUserDTO userDTO) {
+    String methodName = LogUtil.getMethodName(new Object(){});
+    log.info("{}Entering method", methodName);
     String email = userDTO.getEmail();
     String token = userDTO.getToken();
-    String methodName="::validateUser::";
     log.info("{}Trying to validate email={} token={}", methodName, email, token);
     if (StringUtils.isEmpty(token) || StringUtils.isEmpty(email)) {
       log.error("{}Email and/or token are null", methodName);
@@ -110,7 +115,7 @@ public class UserService {
   }
 
   public Mono<UserEntity> findUserEntityByUsername(String username) {
-    String methodName = "::callFindUserEntityByUserName::";
+    String methodName = LogUtil.getMethodName(new Object(){});
     log.info("{}Entering method", methodName);
     return userRepository.findByUsername(username)
       .defaultIfEmpty(new UserEntity())
@@ -125,7 +130,8 @@ public class UserService {
   }
 
   public Mono<Boolean> deleteUser(DeleteUserDTO dto, CurrentUserDTO currentUser){
-    String methodName = "::deleteUser::";
+    String methodName = LogUtil.getMethodName(new Object(){});
+    log.info("{}Entering method", methodName);
     return userRepository.findByUsername(currentUser.getUsername())
       .defaultIfEmpty(new UserEntity())
       .flatMap(entity -> {
@@ -150,27 +156,29 @@ public class UserService {
   }
 
   public Mono<UserDTO> updateUser(UpdateUserDTO dto, CurrentUserDTO currentUser){
-    String methodName = "::updateUser::";
-    return userRepository.findByUsername(currentUser.getUsername())
+    String methodName = LogUtil.getMethodName(new Object(){});
+    log.info("{}Entering method", methodName);
+    return findUserEntityByUsername(currentUser.getUsername())
       .defaultIfEmpty(new UserEntity())
       .flatMap(entity -> {
-        if (entity == null || StringUtils.isEmpty(entity.getUsername())) {
-          log.warn("{}User not found to update. user={}", methodName, currentUser.getUsername());
-          return Mono.error(new NotFoundException("User not found"));
+        if (passwordEncoder.matches(dto.getCurrentPassword(), entity.getPassword())){
+          entity.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+          entity.setLastUpdatedAt(LocalDateTime.now());
+
+          return userRepository.save(entity)
+            .map(UserDTOMapper::map);
         }
         else {
-          if (passwordEncoder.matches(dto.getCurrentPassword(), entity.getPassword())){
-            entity.setPassword(passwordEncoder.encode(dto.getNewPassword()));
-            entity.setLastUpdatedAt(LocalDateTime.now());
-
-            return userRepository.save(entity)
-              .map(UserDTOMapper::map);
-          }
-          else {
-            log.warn("{}Password is not valid. password={}", methodName, entity.getPassword());
-            return Mono.error(new ConflictException("Password is not valid"));
-          }
+          log.warn("{}Password is not valid. password={}", methodName, entity.getPassword());
+          return Mono.error(new ConflictException("Password is not valid"));
         }
       });
+  }
+
+  public Mono<PictureEntity> getProfilePicture(CurrentUserDTO currentUser) {
+    String methodName = LogUtil.getMethodName(new Object(){});
+    log.info("{}Entering method", methodName);
+    return findUserEntityByUsername(currentUser.getUsername())
+      .map(UserEntity::getProfilePicture);
   }
 }

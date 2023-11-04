@@ -20,6 +20,7 @@ public class LoginRouter {
     return route(POST("/register"), loginHandler::handleRegister)
       .andRoute(GET("/regex"), req -> loginHandler.handleRegex())
       .andRoute(GET("/currentUser"), loginHandler::handleCurrentUser)
+      .andRoute(GET("/profilePicture"), loginHandler::handleProfilePicture)
       .andRoute(POST("/validate"), loginHandler::handleValidateUser)
       .andRoute(POST("/login"), loginHandler::handleLogin)
       .andRoute(DELETE("/user"), loginHandler::handleDeleteUser)

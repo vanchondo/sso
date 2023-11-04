@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PictureEntity {
-  private String metadata;
+  private String type;
   private byte[] picture;
 }
