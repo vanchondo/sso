@@ -31,9 +31,11 @@ public abstract class ObjectFactory {
 
   public static SaveUserDTO createSaveUserDTOWithInvalidProperties() {
     SaveUserDTO dto = new SaveUserDTO(
-        "inv@lidUserN@ame$",
-        "notAnEmail.com",
-        "sPass" // short password
+
+      "inv@lidUserN@ame$",
+      "notAnEmail.com",
+      "sPass", // short password
+      TestConstants.PICTURE_BASE64
     );
     dto.setCaptchaResponse("captchaResponse");
 
@@ -42,9 +44,10 @@ public abstract class ObjectFactory {
 
   public static SaveUserDTO createSaveUserDTO() {
     SaveUserDTO dto = new SaveUserDTO(
-        TestConstants.USERNAME,
-        TestConstants.EMAIL,
-        "myPassword"
+      TestConstants.USERNAME,
+      TestConstants.EMAIL,
+      "myPassword",
+      TestConstants.PICTURE_BASE64
     );
     dto.setCaptchaResponse("captchaResponse");
 

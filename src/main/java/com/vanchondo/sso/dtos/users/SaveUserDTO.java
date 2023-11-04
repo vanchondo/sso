@@ -26,4 +26,6 @@ public class SaveUserDTO extends CaptchaDTO{
     @NotNull (message = "Password is required")
     @Pattern(regexp = RegexConstants.PASSWORD_REGEX, message = "Password not valid, min=6, max=50" )
     private String password;
+
+    private String profilePicture;
 }

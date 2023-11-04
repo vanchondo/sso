@@ -20,4 +20,5 @@ public class UserEntity implements Serializable {
     private String verificationToken;
     private boolean isActive;
     private LocalDateTime lastUpdatedAt;
+    private PictureEntity profilePicture;
 }
