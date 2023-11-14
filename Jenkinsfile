@@ -26,7 +26,9 @@ pipeline {
         }
         stage('Docker Build') {
             steps {
-                sh 'docker image build --build-arg secret_key=${JASYPT_SECRET_KEY} -t ${app_name}:${version} .'
+                withCredentials([string(credentialsId: 'jasypt', variable: 'JASYPT_KEY')]) {
+                    sh 'docker image build --build-arg secret_key=${JASYPT_KEY} -t ${app_name}:${version} .'
+                }
                 sh 'docker image tag ${app_name}:${version} ${REGISTRY_SERVER}/${app_name}'
             }
         }
