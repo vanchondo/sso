@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.7.1'
     id 'java'
     id 'jacoco'
+    id 'maven-publish'
 }
 
 group 'com.vanchondo.sso'
@@ -26,6 +27,17 @@ def jacocoExcludeList = [
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri('https://nexus.victoranchondo.com/repository/maven-central/')
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
 }
 
 jacoco {
