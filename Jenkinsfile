@@ -5,8 +5,6 @@ pipeline {
     }
     agent any
     environment {
-        CREDENTIALS = credentials('docker-registry-credentials')
-        NEXUS = credentials('nexus-credentials')
         app_name = 'sso-svc'
         version = "0.${BUILD_NUMBER}"
     }
