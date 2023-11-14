@@ -12,6 +12,7 @@ pipeline {
     stages {
         stage('Gradle Build') {
             steps {
+                discordSend description: "Build started", footer: "", enableArtifactsList: false, link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "${WEBHOOK_URL}"
                 sh './gradlew clean build jacocoTestCoverageVerification'
             }
         }
@@ -45,6 +46,7 @@ pipeline {
         always {
             sh 'docker logout'
             sh 'docker image rm -f ${app_name}:${version}'
+            discordSend description: "Build finished", footer: "", enableArtifactsList: false, link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "${WEBHOOK_URL}"
         }
     }
 }
