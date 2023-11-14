@@ -15,6 +15,11 @@ pipeline {
                 sh './gradlew clean build jacocoTestCoverageVerification'
             }
         }
+        stage('Nexus Deploy') {
+            steps {
+                sh './gradlew publish -PnexusUrl=${NEXUS_URL} -PnexusRepositoryId=${NEXUS_REPO} -PnexusUsername=${NEXUS_USERNAME} -PnexusPassword=${NEXUS_PASSWORD}'
+            }
+        }
         stage('Docker Build') {
             steps {
                 sh 'docker image build --build-arg secret_key=${JASYPT_SECRET_KEY} -t ${app_name}:${version} .'
