@@ -6,6 +6,7 @@ pipeline {
     agent any
     environment {
         CREDENTIALS = credentials('docker-registry-credentials')
+        NEXUS = credentials('nexus-credentials')
         app_name = 'sso-svc'
         version = "0.${BUILD_NUMBER}"
     }
@@ -18,7 +19,9 @@ pipeline {
         }
         stage('Nexus Deploy') {
             steps {
-                sh './gradlew publish -PnexusUrl=${NEXUS_URL} -PnexusRepositoryId=${NEXUS_REPO} -PnexusUsername=${NEXUS_USERNAME} -PnexusPassword=${NEXUS_PASSWORD}'
+                withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                    sh './gradlew publish -PnexusUsername=${NEXUS_USERNAME} -PnexusPassword=${NEXUS_PASSWORD}'
+                }
             }
         }
         stage('Docker Build') {
