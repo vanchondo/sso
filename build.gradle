@@ -43,8 +43,8 @@ publishing {
         maven {
             url = uri('https://nexus.victoranchondo.com/repository/artifactory')
             credentials {
-                username = project.nexusUsername
-                password = project.nexusPassword
+                username = project.hasProperty('nexusUsername') ? project.nexusUsername : ""
+                password = project.hasProperty('nexusPassword') ? project.nexusPassword : ""
             }
         }
     }
