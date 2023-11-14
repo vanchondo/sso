@@ -19,7 +19,9 @@ pipeline {
         }
         stage('Nexus Deploy') {
             steps {
-                sh './gradlew publish -PnexusUsername=${NEXUS} -PnexusPassword=${NEXUS_PSW}'
+                withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                    sh './gradlew publish -PnexusUsername=${NEXUS_USERNAME} -PnexusPassword=${NEXUS_PASSWORD}'
+                }
             }
         }
         stage('Docker Build') {
