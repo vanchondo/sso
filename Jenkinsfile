@@ -18,7 +18,7 @@ pipeline {
         }
         stage('Nexus Deploy') {
             steps {
-                sh './gradlew publish -PnexusUrl=${NEXUS_URL} -PnexusRepositoryId=${NEXUS_REPO} -PnexusUsername=${NEXUS_USERNAME} -PnexusPassword=${NEXUS_PASSWORD}'
+                sh './gradlew upload -PnexusUrl=${NEXUS_URL} -PnexusRepositoryId=${NEXUS_REPO} -PnexusUsername=${NEXUS_USERNAME} -PnexusPassword=${NEXUS_PASSWORD}'
             }
         }
         stage('Docker Build') {
