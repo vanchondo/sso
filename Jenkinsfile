@@ -19,8 +19,8 @@ pipeline {
         }
         stage('Nexus Deploy') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-                    sh './gradlew publish -PnexusUsername=${NEXUS_USERNAME} -PnexusPassword=${NEXUS_PASSWORD}'
+                withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'CREDENTIALS_USERNAME', passwordVariable: 'CREDENTIALS_PASSWORD')]) {
+                    sh './gradlew publish -PnexusUsername=${CREDENTIALS_USERNAME} -PnexusPassword=${CREDENTIALS_PASSWORD}'
                 }
             }
         }
