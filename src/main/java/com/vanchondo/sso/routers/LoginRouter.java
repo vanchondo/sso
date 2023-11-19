@@ -24,7 +24,6 @@ public class LoginRouter {
       .andRoute(POST("/validate"), loginHandler::handleValidateUser)
       .andRoute(POST("/login"), loginHandler::handleLogin)
       .andRoute(DELETE("/user"), loginHandler::handleDeleteUser)
-      .andRoute(PUT("/user"), loginHandler::handleUpdateUser)
-      .andRoute(GET("/version"), loginHandler::handleVersion);
+      .andRoute(PUT("/user"), loginHandler::handleUpdateUser);
   }
 }

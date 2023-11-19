@@ -18,7 +18,7 @@ def jsonwebtoken_version = '0.11.+'
 def swagger_version = '3.0.+'
 def apache_commons_version = "3.12.+"
 def jacoco_version = '0.8.9'
-def security_library_version = "1.0-main.+"
+def security_library_version = '1.0-main.+'
 
 def jacocoExcludeList = [
         "**/configs/**",
@@ -139,4 +139,8 @@ jacocoTestCoverageVerification {
             }
         }
     }
+}
+
+springBoot {
+    buildInfo()
 }
