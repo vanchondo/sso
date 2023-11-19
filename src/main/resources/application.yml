@@ -52,3 +52,5 @@ com:
           methods: GET
         - url: /users/available
           methods: GET
+        - url: /version
+          methods: GET

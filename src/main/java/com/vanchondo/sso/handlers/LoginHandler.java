@@ -156,6 +156,11 @@ public class LoginHandler {
             .contentType(MediaType.valueOf(mimeType))
             .bodyValue(picture);
       });
+  }
 
+  public Mono<ServerResponse> handleVersion(ServerRequest request) {
+    String methodName = LogUtil.getMethodName(new Object(){});
+    log.info("{}Entering method", methodName);
+    return ServerResponse.ok().bodyValue(LogUtil.getArtifactVersion());
   }
 }
