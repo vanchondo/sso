@@ -27,9 +27,11 @@ def jacocoExcludeList = [
 ]
 
 repositories {
-    mavenCentral()
     maven {
         url = uri('https://nexus.victoranchondo.com/repository/artifactory')
+    }
+    maven {
+        url = uri('https://nexus.victoranchondo.com/repository/maven-central/')
     }
 }
 
