@@ -1,10 +1,13 @@
 package com.vanchondo.sso.services;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.vanchondo.security.configs.properties.LoginConfiguration;
+import com.vanchondo.security.dto.UserInfoForTokenDTO;
 import com.vanchondo.security.exception.AuthenticationException;
+import com.vanchondo.security.service.SecurityService;
 import com.vanchondo.sso.dtos.security.LoginDTO;
 import com.vanchondo.sso.entities.UserEntity;
 import com.vanchondo.sso.exceptions.NotFoundException;
@@ -30,6 +33,8 @@ public class AuthenticationServiceTest {
   private PasswordEncoder passwordEncoder;
   @Mock
   private LoginConfiguration loginConfiguration;
+  @Mock
+  private SecurityService securityService;
   @InjectMocks
   private AuthenticationService authenticationService;
 
@@ -38,6 +43,7 @@ public class AuthenticationServiceTest {
     when(loginConfiguration.getExpirationToken()).thenReturn(TestConstants.TOKEN_EXPIRATION);
     when(loginConfiguration.getIssuer()).thenReturn(TestConstants.TOKEN_ISSUER);
     when(loginConfiguration.getSecretKey()).thenReturn(TestConstants.TOKEN_SECRET_KEY);
+    when(securityService.generateToken(any(UserInfoForTokenDTO.class))).thenReturn(ObjectFactory.createTokenDTO());
   }
 
   @Test

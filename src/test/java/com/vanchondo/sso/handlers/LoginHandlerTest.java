@@ -86,7 +86,7 @@ public class LoginHandlerTest {
     when(captchaValidatorService.validateCaptcha(any(CaptchaDTO.class), any(ServerWebExchange.class))).thenReturn(Mono.just(true));
     when(loginConfiguration.getSecretKey()).thenReturn(TestConstants.TOKEN_SECRET_KEY);
     when(loginConfiguration.getUnsecuredUrls()).thenReturn(ObjectFactory.createUnsecureUrls());
-//    when(authenticationService.login(any(LoginDTO.class))).thenReturn(Mono.just(ObjectFactory.createTokenDTO()));
+    when(authenticationService.login(any(LoginDTO.class))).thenReturn(Mono.just(ObjectFactory.createTokenDTO()));
   }
 
   @Test
