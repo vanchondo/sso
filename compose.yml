@@ -1,0 +1,8 @@
+version: "3.9"
+services:
+  sso-svc:
+    image: registry.victoranchondo.com/sso-svc:latest
+    container_name: sso-svc
+    ports:
+      - 8444:8443
+    restart: unless-stopped
