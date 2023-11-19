@@ -1,13 +1,12 @@
 package com.vanchondo.sso.services;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import com.vanchondo.sso.configs.properties.LoginConfiguration;
+import com.vanchondo.security.configs.properties.LoginConfiguration;
+import com.vanchondo.security.exception.AuthenticationException;
 import com.vanchondo.sso.dtos.security.LoginDTO;
 import com.vanchondo.sso.entities.UserEntity;
-import com.vanchondo.sso.exceptions.AuthenticationException;
 import com.vanchondo.sso.exceptions.NotFoundException;
 import com.vanchondo.sso.utilities.ObjectFactory;
 import com.vanchondo.sso.utilities.TestConstants;
@@ -88,11 +87,4 @@ public class AuthenticationServiceTest {
       .expectError(AuthenticationException.class)
       .verify();
   }
-
-  @Test
-  public void testGetSigningKey() {
-    assertNotNull(AuthenticationService.getSigningKey(TestConstants.TOKEN_SECRET_KEY));
-  }
-
-
 }

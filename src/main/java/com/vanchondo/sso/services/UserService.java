@@ -1,6 +1,6 @@
 package com.vanchondo.sso.services;
 
-import com.vanchondo.sso.dtos.security.CurrentUserDTO;
+import com.vanchondo.security.dto.CurrentUserDTO;
 import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.DeleteUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;

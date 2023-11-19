@@ -1,5 +1,6 @@
 package com.vanchondo.sso.exceptions;
 
+import com.vanchondo.security.exception.AuthenticationException;
 import com.vanchondo.sso.dtos.ErrorDTO;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;

@@ -7,12 +7,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.vanchondo.sso.configs.properties.LoginConfiguration;
+import com.vanchondo.security.configs.properties.LoginConfiguration;
+import com.vanchondo.security.dto.CurrentUserDTO;
+import com.vanchondo.security.dto.TokenDTO;
+import com.vanchondo.security.filter.JwtFilter;
 import com.vanchondo.sso.dtos.ErrorDTO;
 import com.vanchondo.sso.dtos.security.CaptchaDTO;
-import com.vanchondo.sso.dtos.security.CurrentUserDTO;
 import com.vanchondo.sso.dtos.security.LoginDTO;
-import com.vanchondo.sso.dtos.security.TokenDTO;
 import com.vanchondo.sso.dtos.security.ValidateUserDTO;
 import com.vanchondo.sso.dtos.users.DeleteUserDTO;
 import com.vanchondo.sso.dtos.users.SaveUserDTO;
@@ -20,7 +21,6 @@ import com.vanchondo.sso.dtos.users.UpdateUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.exceptions.GlobalErrorWebExceptionHandler;
 import com.vanchondo.sso.exceptions.ReCaptchaInvalidException;
-import com.vanchondo.sso.filters.JwtFilter;
 import com.vanchondo.sso.routers.LoginRouter;
 import com.vanchondo.sso.services.AuthenticationService;
 import com.vanchondo.sso.services.CaptchaValidatorService;
@@ -86,7 +86,7 @@ public class LoginHandlerTest {
     when(captchaValidatorService.validateCaptcha(any(CaptchaDTO.class), any(ServerWebExchange.class))).thenReturn(Mono.just(true));
     when(loginConfiguration.getSecretKey()).thenReturn(TestConstants.TOKEN_SECRET_KEY);
     when(loginConfiguration.getUnsecuredUrls()).thenReturn(ObjectFactory.createUnsecureUrls());
-    when(authenticationService.login(any(LoginDTO.class))).thenReturn(Mono.just(ObjectFactory.createTokenDTO()));
+//    when(authenticationService.login(any(LoginDTO.class))).thenReturn(Mono.just(ObjectFactory.createTokenDTO()));
   }
 
   @Test
