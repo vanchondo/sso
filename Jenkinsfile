@@ -32,7 +32,7 @@ pipeline {
         }
         stage('Docker Push') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'CREDENTIALS_USERNAME', passwordVariable: '$CREDENTIALS_PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'CREDENTIALS_USERNAME', passwordVariable: 'CREDENTIALS_PASSWORD')]) {
                     sh 'echo $CREDENTIALS_PASSWORD |  docker login -u ${CREDENTIALS_USERNAME} --password-stdin ${REGISTRY_URL}'
                     sh 'docker push ${REGISTRY_SERVER}/${app_name}'
                 }
@@ -42,7 +42,6 @@ pipeline {
     post {
         always {
             sh 'docker logout'
-            sh 'docker image rm -f ${app_name}:${version}'
             discordSend description: "Build finished", footer: "", enableArtifactsList: false, link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "${WEBHOOK_URL}"
         }
     }
