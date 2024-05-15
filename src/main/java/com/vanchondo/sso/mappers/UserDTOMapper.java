@@ -5,10 +5,7 @@ import com.vanchondo.sso.entities.UserEntity;
 
 public class UserDTOMapper {
 
-    public static UserDTO map(UserEntity entity){
-        return new UserDTO(
-          entity.getUsername(),
-          entity.getEmail()
-        );
-    }
+  public static UserDTO map(UserEntity entity) {
+    return new UserDTO(entity.getUsername(), entity.getEmail());
+  }
 }

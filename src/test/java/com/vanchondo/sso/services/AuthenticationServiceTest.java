@@ -21,29 +21,24 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @ExtendWith({SpringExtension.class})
 public class AuthenticationServiceTest {
-  @Mock
-  private UserService userService;
-  @Mock
-  private PasswordEncoder passwordEncoder;
-  @Mock
-  private LoginConfiguration loginConfiguration;
-  @Mock
-  private SecurityService securityService;
-  @InjectMocks
-  private AuthenticationService authenticationService;
+  @Mock private UserService userService;
+  @Mock private PasswordEncoder passwordEncoder;
+  @Mock private LoginConfiguration loginConfiguration;
+  @Mock private SecurityService securityService;
+  @InjectMocks private AuthenticationService authenticationService;
 
   @BeforeEach
   public void setup() {
     when(loginConfiguration.getExpirationToken()).thenReturn(TestConstants.TOKEN_EXPIRATION);
     when(loginConfiguration.getIssuer()).thenReturn(TestConstants.TOKEN_ISSUER);
     when(loginConfiguration.getSecretKey()).thenReturn(TestConstants.TOKEN_SECRET_KEY);
-    when(securityService.generateToken(any(UserInfoForTokenDTO.class))).thenReturn(ObjectFactory.createTokenDTO());
+    when(securityService.generateToken(any(UserInfoForTokenDTO.class)))
+        .thenReturn(ObjectFactory.createTokenDTO());
   }
 
   @Test
@@ -54,18 +49,19 @@ public class AuthenticationServiceTest {
 
     LoginDTO loginDTO = ObjectFactory.createLoginDto();
     StepVerifier.create(authenticationService.login(loginDTO))
-      .assertNext(Assertions::assertNotNull)
-      .verifyComplete();
+        .assertNext(Assertions::assertNotNull)
+        .verifyComplete();
   }
 
   @Test
   public void testLoginWhenUserNotFound() {
-    when(userService.findUserEntityByUsername(anyString())).thenReturn(Mono.error(new NotFoundException("Not found")));
+    when(userService.findUserEntityByUsername(anyString()))
+        .thenReturn(Mono.error(new NotFoundException("Not found")));
     LoginDTO loginDTO = ObjectFactory.createLoginDto();
 
     StepVerifier.create(authenticationService.login(loginDTO))
-      .expectError(AuthenticationException.class)
-      .verify();
+        .expectError(AuthenticationException.class)
+        .verify();
   }
 
   @Test
@@ -76,8 +72,8 @@ public class AuthenticationServiceTest {
     LoginDTO loginDTO = ObjectFactory.createLoginDto();
 
     StepVerifier.create(authenticationService.login(loginDTO))
-      .expectError(AuthenticationException.class)
-      .verify();
+        .expectError(AuthenticationException.class)
+        .verify();
   }
 
   @Test
@@ -90,7 +86,7 @@ public class AuthenticationServiceTest {
     LoginDTO loginDTO = ObjectFactory.createLoginDto();
 
     StepVerifier.create(authenticationService.login(loginDTO))
-      .expectError(AuthenticationException.class)
-      .verify();
+        .expectError(AuthenticationException.class)
+        .verify();
   }
 }

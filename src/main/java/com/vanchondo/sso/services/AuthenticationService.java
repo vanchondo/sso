@@ -7,11 +7,10 @@ import com.vanchondo.security.service.SecurityService;
 import com.vanchondo.sso.dtos.security.LoginDTO;
 import com.vanchondo.sso.entities.UserEntity;
 import com.vanchondo.sso.exceptions.NotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -19,32 +18,37 @@ import reactor.core.publisher.Mono;
 @AllArgsConstructor
 public class AuthenticationService {
 
-    private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
-    private final SecurityService securityService;
+  private final UserService userService;
+  private final PasswordEncoder passwordEncoder;
+  private final SecurityService securityService;
 
-    public Mono<TokenDTO> login(LoginDTO login) throws AuthenticationException {
-        String username = login.getUsername();
-        String password = login.getPassword();
+  public Mono<TokenDTO> login(LoginDTO login) throws AuthenticationException {
+    String username = login.getUsername();
+    String password = login.getPassword();
 
-        return userService.findUserEntityByUsername(username)
-          .defaultIfEmpty(new UserEntity())
-          .flatMap(user -> {
+    return userService
+        .findUserEntityByUsername(username)
+        .defaultIfEmpty(new UserEntity())
+        .flatMap(
+            user -> {
               if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
-                  log.warn("::login::Invalid email or password for username={}", username);
-                  return Mono.error(new AuthenticationException("Email or password incorrect"));
+                log.warn("::login::Invalid email or password for username={}", username);
+                return Mono.error(new AuthenticationException("Email or password incorrect"));
               }
               if (!user.isActive()) {
-                  log.warn("::login::User is not active, username={}", username);
-                  return Mono.error(new AuthenticationException("User is not active"));
+                log.warn("::login::User is not active, username={}", username);
+                return Mono.error(new AuthenticationException("User is not active"));
               }
               UserInfoForTokenDTO userInfo = new UserInfoForTokenDTO();
               userInfo.setEmail(user.getEmail());
               userInfo.setUsername(user.getUsername());
               return Mono.just(securityService.generateToken(userInfo));
-          }).onErrorResume(NotFoundException.class, ex -> {
+            })
+        .onErrorResume(
+            NotFoundException.class,
+            ex -> {
               log.warn("::login:: User not found", ex);
               return Mono.error(new AuthenticationException("Email or password incorrect"));
-          });
-    }
+            });
+  }
 }

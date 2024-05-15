@@ -9,6 +9,7 @@ import org.apache.logging.log4j.util.Strings;
 @Log4j2
 public class Mapper {
   private static final ObjectMapper mapper = new ObjectMapper();
+
   public static <T> T readValue(String response, TypeReference<T> referenceType) {
     try {
       return mapper.readValue(response, referenceType);

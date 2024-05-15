@@ -5,7 +5,7 @@ import java.nio.charset.Charset;
 
 public abstract class EmailUtil {
 
-  private EmailUtil(){}
+  private EmailUtil() {}
 
   public static String encode(String text) {
     return URLEncoder.encode(text, Charset.defaultCharset());

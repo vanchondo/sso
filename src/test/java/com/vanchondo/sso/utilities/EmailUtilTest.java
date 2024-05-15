@@ -11,7 +11,6 @@ public class EmailUtilTest {
 
   @Test
   public void testEncode() {
-    assertEquals("myEmail%40gmail.com",EmailUtil.encode("myEmail@gmail.com"));
+    assertEquals("myEmail%40gmail.com", EmailUtil.encode("myEmail@gmail.com"));
   }
-
 }

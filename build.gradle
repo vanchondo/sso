@@ -3,6 +3,7 @@ plugins {
     id 'java'
     id 'jacoco'
     id 'maven-publish'
+    id 'com.github.sherter.google-java-format' version '0.9'
 }
 
 group 'com.vanchondo'
@@ -10,6 +11,10 @@ group 'com.vanchondo'
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+}
+
+googleJavaFormat {
+    toolVersion = '1.7'
 }
 
 def lombok_version = '1.18.+'
@@ -146,3 +151,6 @@ jacocoTestCoverageVerification {
 springBoot {
     buildInfo()
 }
+
+build.dependsOn(tasks.googleJavaFormat)
+verifyGoogleJavaFormat.mustRunAfter(tasks.googleJavaFormat)

@@ -7,11 +7,15 @@ import lombok.Data;
 @Data
 public class CaptchaResponseDTO {
   private boolean success;
+
   @JsonProperty("challenge_ts")
   private String challengeTs;
+
   private String hostname;
+
   @JsonProperty("error-codes")
   private ErrorCodeEnum[] errorCodes;
+
   private double score;
   private String action;
 

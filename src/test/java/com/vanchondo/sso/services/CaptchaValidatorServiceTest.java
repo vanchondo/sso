@@ -12,6 +12,9 @@ import com.vanchondo.sso.exceptions.BadRequestException;
 import com.vanchondo.sso.exceptions.ReCaptchaInvalidException;
 import com.vanchondo.sso.utilities.ObjectFactory;
 import com.vanchondo.sso.utilities.TestConstants;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.URI;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,19 +23,12 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ServerWebExchange;
-
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.URI;
-
 import reactor.test.StepVerifier;
 
 @ExtendWith({SpringExtension.class})
 public class CaptchaValidatorServiceTest {
-  @Mock
-  private RestTemplate restTemplate;
-  @Mock
-  private ServerWebExchange exchange;
+  @Mock private RestTemplate restTemplate;
+  @Mock private ServerWebExchange exchange;
   private CaptchaValidatorService captchaValidatorService;
   private static int MAX_ATTEMPTS = 4;
   private static double THRESHOLD = .5;
@@ -56,7 +52,8 @@ public class CaptchaValidatorServiceTest {
     when(request.getRemoteAddress()).thenReturn(socket);
     when(exchange.getRequest()).thenReturn(request);
 
-    when(restTemplate.getForObject(any(URI.class), any())).thenReturn(ObjectFactory.createCaptchaResponseDTO(true, THRESHOLD + .1d));
+    when(restTemplate.getForObject(any(URI.class), any()))
+        .thenReturn(ObjectFactory.createCaptchaResponseDTO(true, THRESHOLD + .1d));
   }
 
   @Test
@@ -64,50 +61,54 @@ public class CaptchaValidatorServiceTest {
     CaptchaDTO captchaDTO = ObjectFactory.createCaptchaDto();
     captchaDTO.setCaptchaResponse(TestConstants.TOKEN_SECRET_KEY);
     StepVerifier.create(captchaValidatorService.validateCaptcha(captchaDTO, exchange))
-      .assertNext(result -> {
-        assertTrue(result);
-        assertTrue(captchaDTO.isTest());
-      })
-      .verifyComplete();
+        .assertNext(
+            result -> {
+              assertTrue(result);
+              assertTrue(captchaDTO.isTest());
+            })
+        .verifyComplete();
   }
 
   @Test
   public void testValidateCaptchaWhenSuccess() {
     CaptchaDTO captchaDTO = ObjectFactory.createCaptchaDto();
     StepVerifier.create(captchaValidatorService.validateCaptcha(captchaDTO, exchange))
-      .assertNext(result -> {
-        assertTrue(result);
-        assertFalse(captchaDTO.isTest());
-      })
-      .verifyComplete();
+        .assertNext(
+            result -> {
+              assertTrue(result);
+              assertFalse(captchaDTO.isTest());
+            })
+        .verifyComplete();
   }
 
   @Test
   public void testValidateCaptchaWhenSuccessIsFalse() {
-    when(restTemplate.getForObject(any(URI.class), any())).thenReturn(ObjectFactory.createCaptchaResponseDTO(false, THRESHOLD + .1d));
+    when(restTemplate.getForObject(any(URI.class), any()))
+        .thenReturn(ObjectFactory.createCaptchaResponseDTO(false, THRESHOLD + .1d));
     CaptchaDTO captchaDTO = ObjectFactory.createCaptchaDto();
     StepVerifier.create(captchaValidatorService.validateCaptcha(captchaDTO, exchange))
-      .expectError(ReCaptchaInvalidException.class)
-      .verify();
+        .expectError(ReCaptchaInvalidException.class)
+        .verify();
   }
 
   @Test
   public void testValidateCaptchaWhenScoreIsLow() {
-    when(restTemplate.getForObject(any(URI.class), any())).thenReturn(ObjectFactory.createCaptchaResponseDTO(true, THRESHOLD - .1d));
+    when(restTemplate.getForObject(any(URI.class), any()))
+        .thenReturn(ObjectFactory.createCaptchaResponseDTO(true, THRESHOLD - .1d));
     CaptchaDTO captchaDTO = ObjectFactory.createCaptchaDto();
     StepVerifier.create(captchaValidatorService.validateCaptcha(captchaDTO, exchange))
-      .expectError(ReCaptchaInvalidException.class)
-      .verify();
+        .expectError(ReCaptchaInvalidException.class)
+        .verify();
   }
 
   @Test
   public void testValidateCaptchaWhenMaxAttemptsHasReached() {
-    for (int i=0; i<MAX_ATTEMPTS; i++){
+    for (int i = 0; i < MAX_ATTEMPTS; i++) {
       testValidateCaptchaWhenSuccessIsFalse();
     }
     CaptchaDTO captchaDTO = ObjectFactory.createCaptchaDto();
     StepVerifier.create(captchaValidatorService.validateCaptcha(captchaDTO, exchange))
-      .expectError(BadRequestException.class)
-      .verify();
+        .expectError(BadRequestException.class)
+        .verify();
   }
 }

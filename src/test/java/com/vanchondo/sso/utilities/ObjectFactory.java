@@ -1,6 +1,5 @@
 package com.vanchondo.sso.utilities;
 
-
 import static com.vanchondo.security.util.SecurityUtils.getSigningKey;
 
 import com.vanchondo.security.configs.properties.UrlResource;
@@ -16,9 +15,8 @@ import com.vanchondo.sso.dtos.users.UpdateUserDTO;
 import com.vanchondo.sso.dtos.users.UserDTO;
 import com.vanchondo.sso.entities.PictureEntity;
 import com.vanchondo.sso.entities.UserEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -26,33 +24,31 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 
 public abstract class ObjectFactory {
   private ObjectFactory() {}
 
   public static SaveUserDTO createSaveUserDTOWithInvalidProperties() {
-    SaveUserDTO dto = new SaveUserDTO(
-
-      "inv@lidUserN@ame$",
-      "notAnEmail.com",
-      "sPass", // short password
-      TestConstants.PICTURE_BASE64
-    );
+    SaveUserDTO dto =
+        new SaveUserDTO(
+            "inv@lidUserN@ame$",
+            "notAnEmail.com",
+            "sPass", // short password
+            TestConstants.PICTURE_BASE64);
     dto.setCaptchaResponse("captchaResponse");
 
     return dto;
   }
 
   public static SaveUserDTO createSaveUserDTO() {
-    SaveUserDTO dto = new SaveUserDTO(
-      TestConstants.USERNAME,
-      TestConstants.EMAIL,
-      "myPassword",
-      TestConstants.PICTURE_BASE64
-    );
+    SaveUserDTO dto =
+        new SaveUserDTO(
+            TestConstants.USERNAME,
+            TestConstants.EMAIL,
+            "myPassword",
+            TestConstants.PICTURE_BASE64);
     dto.setCaptchaResponse("captchaResponse");
 
     return dto;
@@ -63,29 +59,26 @@ public abstract class ObjectFactory {
     cal.setTime(new Date());
     cal.add(Calendar.MINUTE, TestConstants.TOKEN_EXPIRATION);
 
-    return new TokenDTO(Jwts.builder()
-      .setIssuer(TestConstants.TOKEN_ISSUER)
-      .setSubject(TestConstants.EMAIL)
-      .claim(Constants.CLAIM_USERNAME_PROPERTY, TestConstants.USERNAME)
-      .setIssuedAt(new Date())
-      .setExpiration(cal.getTime())
-      .signWith(
-        getSigningKey(TestConstants.TOKEN_SECRET_KEY),
-        SignatureAlgorithm.HS256
-      )
-      .compact());
+    return new TokenDTO(
+        Jwts.builder()
+            .setIssuer(TestConstants.TOKEN_ISSUER)
+            .setSubject(TestConstants.EMAIL)
+            .claim(Constants.CLAIM_USERNAME_PROPERTY, TestConstants.USERNAME)
+            .setIssuedAt(new Date())
+            .setExpiration(cal.getTime())
+            .signWith(getSigningKey(TestConstants.TOKEN_SECRET_KEY), SignatureAlgorithm.HS256)
+            .compact());
   }
 
   public static List<UrlResource> createUnsecureUrls() {
     return Arrays.asList(
-      new UrlResource("/swagger*", Collections.singletonList(HttpMethod.GET.name())),
-      new UrlResource("/v2/api-docs", Collections.singletonList(HttpMethod.GET.name())),
-      new UrlResource("/login", Collections.singletonList(HttpMethod.POST.name())),
-      new UrlResource("/validate", Collections.singletonList(HttpMethod.POST.name())),
-      new UrlResource("/register", Collections.singletonList(HttpMethod.POST.name())),
-      new UrlResource("/regex", Collections.singletonList(HttpMethod.GET.name())),
-      new UrlResource("/users/available", Collections.singletonList(HttpMethod.GET.name()))
-    );
+        new UrlResource("/swagger*", Collections.singletonList(HttpMethod.GET.name())),
+        new UrlResource("/v2/api-docs", Collections.singletonList(HttpMethod.GET.name())),
+        new UrlResource("/login", Collections.singletonList(HttpMethod.POST.name())),
+        new UrlResource("/validate", Collections.singletonList(HttpMethod.POST.name())),
+        new UrlResource("/register", Collections.singletonList(HttpMethod.POST.name())),
+        new UrlResource("/regex", Collections.singletonList(HttpMethod.GET.name())),
+        new UrlResource("/users/available", Collections.singletonList(HttpMethod.GET.name())));
   }
 
   public static UserEntity createUserEntity() {
@@ -105,10 +98,7 @@ public abstract class ObjectFactory {
   }
 
   public static PictureEntity createPictureEntity(byte[] content) {
-    return new PictureEntity(
-      MediaType.IMAGE_JPEG_VALUE,
-      content
-    );
+    return new PictureEntity(MediaType.IMAGE_JPEG_VALUE, content);
   }
 
   public static LoginDTO createLoginDto() {
@@ -175,5 +165,4 @@ public abstract class ObjectFactory {
 
     return dto;
   }
-
 }
