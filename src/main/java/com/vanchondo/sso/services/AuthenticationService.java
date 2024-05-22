@@ -22,6 +22,13 @@ public class AuthenticationService {
   private final PasswordEncoder passwordEncoder;
   private final SecurityService securityService;
 
+  /**
+   * Logs in a user and returns their access token.
+   *
+   * @param loginDTO the login details of the user
+   * @return a Mono containing the user's access token or an error if there was a problem logging in
+   * @throws AuthenticationException if there is a problem authenticating the user
+   */
   public Mono<TokenDTO> login(LoginDTO login) throws AuthenticationException {
     String username = login.getUsername();
     String password = login.getPassword();

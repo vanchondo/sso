@@ -15,6 +15,12 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 @Configuration
 public class LoginRouter {
 
+  /**
+   * Provides a routing function for handling login requests.
+   *
+   * @param loginHandler the handler class to handle login requests
+   * @return the router function for handling login requests
+   */
   @Bean
   public RouterFunction<ServerResponse> loginRoute(LoginHandler loginHandler) {
     return route(POST("/register"), loginHandler::handleRegister)
