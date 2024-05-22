@@ -39,6 +39,15 @@ public class CaptchaValidatorService {
                 });
   }
 
+  /**
+   * Validates a captcha response based on the configuration secret. If the secret matches, sets the
+   * request as test and returns true. Otherwise, delegates the validation to {@link
+   * #validateCaptchaReactive(String, String)}.
+   *
+   * @param dto the CaptchaDTO containing the captcha response
+   * @param exchange the ServerWebExchange for retrieving the client IP address
+   * @return a Mono of Boolean indicating whether the captcha is valid or not
+   */
   public Mono<Boolean> validateCaptcha(CaptchaDTO dto, ServerWebExchange exchange) {
     String methodName = "::validateCaptcha::";
     if (configuration.getSecret().equals(dto.getCaptchaResponse())) {

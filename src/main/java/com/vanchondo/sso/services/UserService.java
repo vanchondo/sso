@@ -33,6 +33,14 @@ public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
 
+  /**
+   * Saves a new user in the database, generating a verification token and sending an email to the
+   * user.
+   *
+   * @param dto the user data transfer object
+   * @return a Mono containing the saved user entity
+   * @throws ConflictException if the email or username already exists
+   */
   public Mono<UserDTO> saveUser(SaveUserDTO dto) {
     String methodName = LogUtil.getMethodName(new Object() {});
     log.info("{}Entering method", methodName);
@@ -95,6 +103,13 @@ public class UserService {
             });
   }
 
+  /**
+   * Validates a user by checking if their email and token are valid.
+   *
+   * @param userDTO the {@link ValidateUserDTO} containing the user's email and token
+   * @return a Mono emitting a Boolean value indicating whether the user was validated successfully
+   *     or not
+   */
   public Mono<Boolean> validateUser(ValidateUserDTO userDTO) {
     String methodName = LogUtil.getMethodName(new Object() {});
     log.info("{}Entering method", methodName);
@@ -127,6 +142,12 @@ public class UserService {
             });
   }
 
+  /**
+   * Find a UserEntity by username in the database.
+   *
+   * @param username The username of the user to find
+   * @return A Mono<UserEntity> object representing the found user, or null if no user was found.
+   */
   public Mono<UserEntity> findUserEntityByUsername(String username) {
     String methodName = LogUtil.getMethodName(new Object() {});
     log.info("{}Entering method", methodName);
@@ -144,6 +165,14 @@ public class UserService {
             });
   }
 
+  /**
+   * Deletes a user based on the current user and their password.
+   *
+   * @param dto the delete user DTO containing the password to be verified
+   * @param currentUserDTO the current user information
+   * @return a mono that represents the result of deleting the user, true if successful, false
+   *     otherwise
+   */
   public Mono<Boolean> deleteUser(DeleteUserDTO dto, CurrentUserDTO currentUser) {
     String methodName = LogUtil.getMethodName(new Object() {});
     log.info("{}Entering method", methodName);
@@ -182,6 +211,13 @@ public class UserService {
             });
   }
 
+  /**
+   * Updates a UserDTO based on an UpdateUserDTO and returns it as a Mono.
+   *
+   * @param dto The update user DTO.
+   * @param currentUser The CurrentUserDTO.
+   * @return A mono of the updated user.
+   */
   public Mono<UserDTO> updateUser(UpdateUserDTO dto, CurrentUserDTO currentUser) {
     String methodName = LogUtil.getMethodName(new Object() {});
     log.info("{}Entering method", methodName);
@@ -201,6 +237,12 @@ public class UserService {
             });
   }
 
+  /**
+   * Get the current user's profile picture.
+   *
+   * @param currentUser The current user DTO
+   * @return The profile picture entity, or a new empty entity if not found
+   */
   public Mono<PictureEntity> getProfilePicture(CurrentUserDTO currentUser) {
     String methodName = LogUtil.getMethodName(new Object() {});
     log.info("{}Entering method", methodName);

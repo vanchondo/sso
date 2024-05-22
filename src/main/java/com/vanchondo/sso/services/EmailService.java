@@ -48,6 +48,14 @@ public class EmailService {
             });
   }
 
+  /**
+   * Sends a validation email to the specified email address using Reactive Programming.
+   *
+   * @param toEmail The email address to send the validation email to.
+   * @param token The verification token for the account.
+   * @return A Mono of Void that can be used to represent the completion of the email sending
+   *     process.
+   */
   public Mono<Void> sendEmailReactive(String toEmail, String token) {
     return Mono.fromCallable(
             () -> {
